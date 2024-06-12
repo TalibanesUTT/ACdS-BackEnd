@@ -1,0 +1,14 @@
+services:
+  nestjs:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src:cached
+      - .:/app
+      - node_modules:/app/node_modules
+    container_name: acds-nestjs
+
+volumes:
+  node_modules:
+      
