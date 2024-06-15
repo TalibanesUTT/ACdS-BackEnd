@@ -8,7 +8,14 @@ services:
       - .:/app
       - node_modules:/app/node_modules
     container_name: acds-nestjs
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: docker
+      MYSQL_DATABASE: ACdS_DB
+    container_name: acds-mysql
 
 volumes:
   node_modules:
-      
