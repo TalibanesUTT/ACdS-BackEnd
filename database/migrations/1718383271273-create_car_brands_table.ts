@@ -1,32 +1,38 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableIndex } from "typeorm";
 
-export class CreateRolesTable1718310483086 implements MigrationInterface {
+export class CreateCarBrandsTable1718383271273 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(new Table({
-            name: 'Roles',
+            name: 'CarBrands',
             columns: [
                 new TableColumn({
                     name: 'id',
                     type: 'int',
                     isPrimary: true,
                     isNullable: false,
-                    isGenerated: true,       
+                    isGenerated: true,
                     generationStrategy: 'increment',
                     unsigned: true,
                 }),
                 new TableColumn({
-                    name: 'role',
+                    name: 'brand',
                     type: 'varchar',
-                    length: '15',
+                    length: '70',
                     isNullable: false,
                     isUnique: true,
                 }),
             ]
         }))
+
+        await queryRunner.createIndex('CarBrands', new TableIndex({
+            name: 'idx_brand_brand',
+            columnNames: ['brand'],
+        }))
+
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('Roles');
+        await queryRunner.dropTable('CarBrands');
     }
 }
