@@ -1,0 +1,29 @@
+services:
+  nestjs:
+    build: .
+    user: "nestjs"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src:delegated
+      - .:/app:delegated
+      - node_modules:/app/node_modules
+    container_name: acds-nestjs
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=docker
+      - DATABASE_NAME=ACdS_DB 
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: docker
+      MYSQL_DATABASE: ACdS_DB
+    container_name: acds-mysql
+
+volumes:
+  node_modules:
