@@ -19,6 +19,7 @@ async function bootstrap() {
         .setTitle("ACdS API")
         .setDescription("API para el proyecto ACdS")
         .setVersion("1.0")
+        .addBearerAuth()
         .addTag("ACdS")
         .build();
 
