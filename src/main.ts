@@ -2,9 +2,12 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
+import { configDotenv } from "dotenv";
+import { SeederService } from "./seeder/seeder.service";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    configDotenv();
 
     // Enable global validation pipe
     app.useGlobalPipes(
@@ -14,6 +17,9 @@ async function bootstrap() {
             forbidNonWhitelisted: true, // Throw error if unknown properties are found
         }),
     );
+
+    const seeder = app.get(SeederService);
+    await seeder.seed();
 
     const configSwagger = new DocumentBuilder()
         .setTitle("ACdS API")

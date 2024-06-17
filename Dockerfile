@@ -11,17 +11,14 @@ COPY package.json package-lock.json ./
 # Install project dependencies
 RUN npm install
 
+RUN addgroup -S nestjs && adduser -S nestjs -G node
 # Copy the rest of your app's source code from your host to your image filesystem.
-COPY . .
+COPY --chown=nestjs . .
 
 # Install NestJS CLI globally
 RUN npm i -g @nestjs/cli
 
 # Create a new user "nestjs" and add user to "node" group
-RUN addgroup -S nestjs && adduser -S nestjs -G node
-
-# Change ownership of the /app directory to "nestjs" user and "node" group
-RUN chown -R nestjs:node /app
 
 # Set the default shell for the "nestjs" user
 RUN echo "nestjs ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \

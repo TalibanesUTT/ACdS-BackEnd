@@ -39,7 +39,7 @@ export class RegisterDto {
 
     @ApiProperty({
         description: "El número de teléfono del usuario",
-        example: "+1234567890",
+        example: "1234567890",
     })
     @IsNotEmpty()
     phone: string;
