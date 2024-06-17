@@ -1,23 +1,29 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth/auth.service';
+import { Controller, Get, Request, UseGuards } from "@nestjs/common";
+import { AppService } from "./app.service";
+import { AuthService } from "./auth/auth.service";
+import { JwtAuthGuard } from "./auth/jwt-auth.guard";
+// import { ApiBearerAuth, ApiHeader } from "@nestjs/swagger";
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly authService: AuthService,
-  ) {}
+    constructor(
+        private readonly appService: AppService,
+        private readonly authService: AuthService,
+    ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Get()
+    getHello(): string {
+        return this.appService.getHello();
+    }
 
-  @UseGuards(AuthGuard('local'))
-  @Post('auth/login')
-  async login(@Request() req) {
-    return this.authService.generateToken(req.user);
-  }
+    @Get("profile")
+    /*   @ApiHeader({
+        name: "Authorization",
+        description: "Bearer <access_token>",
+    })
+    @ApiBearerAuth() */
+    @UseGuards(JwtAuthGuard)
+    getProfile(@Request() req) {
+        return req.user;
+    }
 }
