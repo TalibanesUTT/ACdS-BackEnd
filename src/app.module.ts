@@ -16,7 +16,7 @@ import { UsersModule } from "./users/users.module";
             useFactory: () => ({
                 type: "mysql",
                 host: "mysql",
-                port: 3306,
+                port: 3310,
                 username: "root",
                 password: "docker",
                 database: "ACdS_DB",
