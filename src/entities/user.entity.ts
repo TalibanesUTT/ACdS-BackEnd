@@ -11,31 +11,37 @@ export class User {
     @Column()
     name: string;
 
-    @Column()
+    @Column({
+        name: "last_name",
+    })
     lastName: string;
 
     @Column({ unique: true })
     email: string;
 
-    @Column({ unique: true })
+    @Column({ unique: true, name: "phone_number" })
     phoneNumber: string;
 
     @Column()
     password: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
 
-    @Column({ default: false })
+    @Column({ default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
-    @Column({ default: false })
+    @Column({ default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 
     @Column({ default: true })
     active: boolean;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    @Column({
+        type: "timestamp",
+        name: "create_date",
+        default: () => "CURRENT_TIMESTAMP",
+    })
     createDate: Date;
 
     async comparePassword(attempt: string): Promise<boolean> {
