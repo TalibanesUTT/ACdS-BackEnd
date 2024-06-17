@@ -1,6 +1,7 @@
 services:
   nestjs:
     build: .
+    user: "nestjs"
     ports:
       - "3000:3000"
     volumes:
