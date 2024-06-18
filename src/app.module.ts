@@ -5,8 +5,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
-import { SeederService } from "./seeder/seeder.service";
-import { RoleSeederService } from "./seeder/role.seeder/role.seeder.service";
 import { SeederModule } from "./seeder/seeder.module";
 
 @Module({
