@@ -18,6 +18,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'linebreak-style': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -29,6 +30,7 @@ module.exports = {
         arrowParens: 'always',
         tabWidth: 4,
         useTabs: false,
+        endOfLine: "auto"
       },
     ],
   },

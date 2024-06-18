@@ -12,7 +12,6 @@
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	"service": "nestjs",
-	"containerUser": "nestjs",
 
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/app",
@@ -22,8 +21,9 @@
 				"ms-azuretools.vscode-docker",
 				"imgildev.vscode-nestjs-pack"
 			]
-		}
-	}
+		},
+	},
+	"overrideCommand": false
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
