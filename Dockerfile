@@ -1,11 +1,11 @@
-FROM node:lts-slim as build
+FROM node:lts-alpine as build
 
 WORKDIR /app
 # Install NestJS CLI globally
 RUN npm i -g @nestjs/cli
 
 # Install git and other dependencies
-RUN apt-get update && apt-get install -y git procps
+RUN apk add --no-cache git procps
 
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
