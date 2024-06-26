@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Role, RoleEnum } from "src/entities/role.entity";
+import { Role, RoleEnum } from "src/app/entities/role.entity";
 import { DeepPartial, Repository } from "typeorm";
 import { BaseSeederService } from "../base.seeder.service";
 

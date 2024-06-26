@@ -3,11 +3,20 @@ import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { configDotenv } from "dotenv";
-import { SeederService } from "./seeder/seeder.service";
+import { createDataSource } from "./config/data-source.config";
+import { CustomConfigService } from "./config/custom-config.service";
+import { SeederService } from "./database/seeders/seeder.service";
+import { AllExceptionFilter } from "./config/exception.filter";
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
     configDotenv();
+    const app = await NestFactory.create(AppModule);
+
+    const dataSource = await (async () => {
+        const configService = app.get(CustomConfigService);
+        return createDataSource(configService);
+    })();
+    await dataSource.initialize();
 
     // Enable global validation pipe
     app.useGlobalPipes(
@@ -17,6 +26,8 @@ async function bootstrap() {
             forbidNonWhitelisted: true, // Throw error if unknown properties are found
         }),
     );
+
+    app.useGlobalFilters(new AllExceptionFilter());
 
     const seeder = app.get(SeederService);
     await seeder.seed();
