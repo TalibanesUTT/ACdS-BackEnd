@@ -19,7 +19,7 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @Column({ unique: true, name: "phone_number" })
+    @Column({ name: "phone_number" })
     phoneNumber: string;
 
     @Column()
@@ -34,7 +34,7 @@ export class User {
     @Column({ default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 
-    @Column({ default: true })
+    @Column({ default: false })
     active: boolean;
 
     @Column({
@@ -45,7 +45,6 @@ export class User {
     createDate: Date;
 
     async comparePassword(attempt: string): Promise<boolean> {
-        console.log(attempt);
-        return await bcrypt.compare(attempt, this.password);
+        return await bcrypt.compare(attempt, this.password);;
     }
 }

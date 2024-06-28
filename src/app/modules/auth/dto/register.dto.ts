@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, MinLength, IsEmail, Matches, MaxLength } from "class-validator";
-//import { IsUnique } from "src/validators/unique.validator";
+import { IsNotEmpty, MinLength, IsEmail, MaxLength } from "class-validator";
 
 export class RegisterDto {
     @ApiProperty({ description: "Los nombres del usuario", example: "Juan" })
@@ -19,7 +18,6 @@ export class RegisterDto {
     })
     @IsNotEmpty({ message: "El correo electrónico es obligatorio"})
     @IsEmail({}, { message: "El correo electrónico no es válido"})
-    //@IsUnique('Users', 'email', { message: "El correo electrónico ya se encuentra en uso" })
     @MaxLength(100, { message: "El correo electrónico puede contener un máximo de 100 caracteres"})
     email: string;
 
@@ -30,9 +28,6 @@ export class RegisterDto {
     @IsNotEmpty({ message: "La contraseña es obligatoria"})
     @MinLength(8, { message: "La contraseña debe contener al menos 8 caracteres"})
     @MaxLength(30, { message: "La contraseña puede contener un máximo de 30 caracteres"})
-    @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/, {
-        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial (!@#$%^&*()-+)",
-    })
     password: string;
 
     @ApiProperty({

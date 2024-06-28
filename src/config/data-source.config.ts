@@ -9,7 +9,7 @@ export const createDataSource = (configService: CustomConfigService): DataSource
         username: configService.databaseUser,
         password: configService.databasePassword,
         database: configService.databaseName,
-        migrations: ["dist/database/migrations/*.js"],
+        migrations: ["dist/src/database/migrations/*.js"],
         migrationsTableName: "_migrations",
         entities: ["dist/**/*.entity{.ts,.js}"],
         migrationsRun: true,

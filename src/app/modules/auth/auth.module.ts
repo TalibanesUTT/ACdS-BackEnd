@@ -9,11 +9,15 @@ import { JwtStrategy } from "./jwt.strategy";
 import { AuthController } from "./auth.controller";
 import { User } from "src/app/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { SignedUrlModule } from "src/app/services/signed-url/signed-url.module";
+import { MailerModule } from "src/app/services/mailer/mailer.module";
 
 @Module({
     imports: [
         UsersModule,
         PassportModule,
+        SignedUrlModule,
+        MailerModule,
         JwtModule.register({
             secret: jwtConstants.secret,
             signOptions: { expiresIn: "60m" },

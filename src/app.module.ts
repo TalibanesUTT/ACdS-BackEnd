@@ -11,6 +11,8 @@ import { UsersModule } from "./app/modules/users/users.module";
 import { SeederModule } from "./database/seeders/seeder.module";
 import { APP_FILTER } from "@nestjs/core";
 import { AllExceptionFilter } from "./config/exception.filter";
+import { SignedUrlModule } from "./app/services/signed-url/signed-url.module";
+import { MailerModule } from "./app/services/mailer/mailer.module";
 
 @Module({
     imports: [
@@ -27,6 +29,9 @@ import { AllExceptionFilter } from "./config/exception.filter";
                return dataSource.options;
             },
         }),
+        TypeOrmModule.forFeature([]),
+        SignedUrlModule,
+        MailerModule,
         AuthModule,
         UsersModule,
         SeederModule,
