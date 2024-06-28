@@ -18,13 +18,13 @@ import { AllExceptionFilter } from "./config/exception.filter";
             isGlobal: true,
         }),
         CustomConfigModule,
-        TypeOrmModule.forRootAsync({ 
+        TypeOrmModule.forRootAsync({
             imports: [CustomConfigModule],
             inject: [CustomConfigService],
             useFactory: async (configService: CustomConfigService) => {
-               const dataSource = createDataSource(configService);
-               await dataSource.initialize();
-               return dataSource.options;
+                const dataSource = createDataSource(configService);
+                await dataSource.initialize();
+                return dataSource.options;
             },
         }),
         AuthModule,
@@ -33,8 +33,8 @@ import { AllExceptionFilter } from "./config/exception.filter";
     ],
     controllers: [AppController],
     providers: [
-        AppService, 
-        { provide: APP_FILTER, useClass: AllExceptionFilter }
+        AppService,
+        { provide: APP_FILTER, useClass: AllExceptionFilter },
     ],
 })
 export class AppModule {}

@@ -2,6 +2,11 @@ import { Controller, Get, Request, UseGuards } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { JwtAuthGuard } from "./app/modules/auth/jwt-auth.guard";
 import { ApiBearerAuth } from "@nestjs/swagger";
+import { Roles } from "./config/roles.decorator";
+import { RoleEnum } from "./app/entities/role.entity";
+import { GetUser } from "./config/user.decorator";
+import { User } from "./app/entities/user.entity";
+import { RolesGuard } from "./common/roles.guard";
 // import { ApiBearerAuth, ApiHeader } from "@nestjs/swagger";
 
 @Controller()
@@ -20,7 +25,15 @@ export class AppController {
     }) */
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    getProfile(@Request() req: any) {
+    getProfile(@GetUser() user: User) {
+        return user;
+    }
+
+    @Get("admin")
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.GUEST)
+    getAdmin(@Request() req: any) {
         return req.user;
     }
 }

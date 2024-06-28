@@ -17,10 +17,10 @@ export class RoleSeederService extends BaseSeederService<Role> {
     }
 
     protected getIdentity(entity: DeepPartial<Role>) {
-        return entity.role;
+        return entity.value;
     }
 
     protected get data(): DeepPartial<Role>[] {
-        return Object.values(RoleEnum).map((role) => ({ role }));
+        return Object.values(RoleEnum).map((value) => ({ value }));
     }
 }

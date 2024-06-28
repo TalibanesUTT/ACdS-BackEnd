@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from "bcrypt";
+import { Role } from "./role.entity";
 
 @Entity({
     name: "Users",
@@ -43,6 +44,10 @@ export class User {
         default: () => "CURRENT_TIMESTAMP",
     })
     createDate: Date;
+
+    @ManyToOne(() => Role, (role) => role.users)
+    @JoinColumn({ name: "role_id" })
+    role: Role;
 
     async comparePassword(attempt: string): Promise<boolean> {
         console.log(attempt);
