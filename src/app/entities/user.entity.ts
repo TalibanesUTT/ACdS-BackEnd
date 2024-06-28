@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Role } from "./role.entity";
 
@@ -45,7 +51,9 @@ export class User {
     })
     createDate: Date;
 
-    @ManyToOne(() => Role, (role) => role.users)
+    @ManyToOne(() => Role, (role) => role.users, {
+        eager: true,
+    })
     @JoinColumn({ name: "role_id" })
     role: Role;
 

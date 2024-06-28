@@ -1,10 +1,11 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
 export enum RoleEnum {
-    GUEST = "guest",
+    CUSTOMER = "customer",
+    ROOT = "root",
     ADMIN = "admin",
-    USER = "user",
+    MECHANIC = "mechanic",
 }
 
 @Entity({

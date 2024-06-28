@@ -6,8 +6,6 @@ import { Roles } from "./config/roles.decorator";
 import { RoleEnum } from "./app/entities/role.entity";
 import { GetUser } from "./config/user.decorator";
 import { User } from "./app/entities/user.entity";
-import { RolesGuard } from "./common/roles.guard";
-// import { ApiBearerAuth, ApiHeader } from "@nestjs/swagger";
 
 @Controller()
 export class AppController {
@@ -31,9 +29,8 @@ export class AppController {
 
     @Get("admin")
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.GUEST)
-    getAdmin(@Request() req: any) {
-        return req.user;
+    @Roles(RoleEnum.ADMIN)
+    getAdmin(@GetUser() user: User) {
+        return user;
     }
 }
