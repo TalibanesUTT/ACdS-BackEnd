@@ -70,7 +70,8 @@ export class AuthService {
             );
             const phoneUrl = this.signedUrlService.createSignedUrl(
                 MailConstants.EndpointVerifyPhone, 
-                { sub: newUser.id, phone: newUser.phoneNumber, type: 'phone-verification'});
+                { sub: newUser.id, phone: newUser.phoneNumber, type: 'phone-verification'}
+            );
 
             await this.mailerService.sendMail(newUser.email, MailConstants.SubjectVerificationMail, 'verify-email', { url: emailUrl })
             

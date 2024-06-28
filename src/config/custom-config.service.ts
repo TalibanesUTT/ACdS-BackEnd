@@ -52,4 +52,12 @@ export class CustomConfigService {
     get mailFrom(): string {
         return this.configService.get<string>('MAIL_FROM');
     }
+
+    get vonageApiKey(): string {
+        return this.configService.get<string>('VONAGE_API_KEY');
+    }
+
+    get vonageApiSecret(): string {
+        return this.configService.get<string>('VONAGE_API_SECRET');
+    }
 }

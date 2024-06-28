@@ -13,6 +13,8 @@ import { APP_FILTER } from "@nestjs/core";
 import { AllExceptionFilter } from "./config/exception.filter";
 import { SignedUrlModule } from "./app/services/signed-url/signed-url.module";
 import { MailerModule } from "./app/services/mailer/mailer.module";
+import { RandomCodeModule } from "./app/services/random-code/random-code.module";
+import { VonageModule } from "./app/services/vonage/vonage.module";
 
 @Module({
     imports: [
@@ -32,6 +34,8 @@ import { MailerModule } from "./app/services/mailer/mailer.module";
         TypeOrmModule.forFeature([]),
         SignedUrlModule,
         MailerModule,
+        RandomCodeModule,
+        VonageModule,
         AuthModule,
         UsersModule,
         SeederModule,

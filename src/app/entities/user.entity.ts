@@ -28,13 +28,13 @@ export class User {
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
 
-    @Column({ default: false, name: "email_confirmed" })
+    @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
-    @Column({ default: false, name: "phone_confirmed" })
+    @Column({ type: "boolean", default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 
-    @Column({ default: false })
+    @Column({ type: "boolean", default: false })
     active: boolean;
 
     @Column({
