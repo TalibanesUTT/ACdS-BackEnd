@@ -5,5 +5,4 @@ import { CustomConfigService } from "./custom-config.service";
     providers: [CustomConfigService],
     exports: [CustomConfigService],
 })
-
 export class CustomConfigModule {}

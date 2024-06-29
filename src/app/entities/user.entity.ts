@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import * as bcrypt from "bcrypt";
+import { Role, RoleEnum } from "./role.entity";
+import { Transform } from "class-transformer";
 
 @Entity({
     name: "Users",
@@ -44,7 +52,14 @@ export class User {
     })
     createDate: Date;
 
+    @ManyToOne(() => Role, (role) => role.users, {
+        eager: true,
+    })
+    @JoinColumn({ name: "role_id" })
+    @Transform(({ value }) => value.value)
+    role: RoleEnum;
+
     async comparePassword(attempt: string): Promise<boolean> {
-        return await bcrypt.compare(attempt, this.password);;
+        return await bcrypt.compare(attempt, this.password);
     }
 }

@@ -15,13 +15,18 @@ export class SignedUrlService {
     }
 
     createSignedUrl(endpoint: string, payload: JwtPayload): string {
-        const token = jwt.sign(payload, this.jwtSecret, { expiresIn: this.expirationTime });
+        const token = jwt.sign(payload, this.jwtSecret, {
+            expiresIn: this.expirationTime,
+        });
         return `${this.appUrl}/signed-url/verify/${endpoint}?token=${token}`;
     }
 
     verifySignedUrl(token: string): JwtPayload | null {
         try {
-            const payload = jwt.verify(token, this.jwtSecret) as unknown as JwtPayload;
+            const payload = jwt.verify(
+                token,
+                this.jwtSecret,
+            ) as unknown as JwtPayload;
             return payload;
         } catch (error) {
             return null;
