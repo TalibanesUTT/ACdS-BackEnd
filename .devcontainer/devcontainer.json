@@ -21,7 +21,7 @@
 				"ms-azuretools.vscode-docker",
 				"imgildev.vscode-nestjs-pack"
 			]
-		},
+		}
 	},
 	"overrideCommand": false
 
