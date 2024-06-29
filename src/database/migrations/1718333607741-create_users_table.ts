@@ -61,13 +61,13 @@ export class CreateUsersTable1718333607741 implements MigrationInterface {
                     }),
                     new TableColumn({
                         name: "email_confirmed",
-                        type: "bit",
+                        type: "boolean",
                         isNullable: false,
                         default: 0,
                     }),
                     new TableColumn({
                         name: "phone_confirmed",
-                        type: "bit",
+                        type: "boolean",
                         isNullable: false,
                         default: 0,
                     }),
@@ -80,7 +80,7 @@ export class CreateUsersTable1718333607741 implements MigrationInterface {
                     }),
                     new TableColumn({
                         name: "active",
-                        type: "bit",
+                        type: "boolean",
                         isNullable: false,
                         default: 0,
                     }),

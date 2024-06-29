@@ -33,4 +33,11 @@ export class AppController {
     getAdmin(@GetUser() user: User) {
         return user;
     }
+
+    @Get("customer")
+    @ApiBearerAuth()
+    @Roles(RoleEnum.CUSTOMER)
+    getCustomer(@GetUser() user: User) {
+        return user;
+    }
 }

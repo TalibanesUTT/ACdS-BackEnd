@@ -6,7 +6,8 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { Role } from "./role.entity";
+import { Role, RoleEnum } from "./role.entity";
+import { Transform } from "class-transformer";
 
 @Entity({
     name: "Users",
@@ -26,7 +27,7 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @Column({ unique: true, name: "phone_number" })
+    @Column({ name: "phone_number" })
     phoneNumber: string;
 
     @Column()
@@ -35,13 +36,13 @@ export class User {
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
 
-    @Column({ default: false, name: "email_confirmed" })
+    @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
-    @Column({ default: false, name: "phone_confirmed" })
+    @Column({ type: "boolean", default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 
-    @Column({ default: true })
+    @Column({ type: "boolean", default: false })
     active: boolean;
 
     @Column({
@@ -55,10 +56,10 @@ export class User {
         eager: true,
     })
     @JoinColumn({ name: "role_id" })
-    role: Role;
+    @Transform(({ value }) => value.value)
+    role: RoleEnum;
 
     async comparePassword(attempt: string): Promise<boolean> {
-        console.log(attempt);
         return await bcrypt.compare(attempt, this.password);
     }
 }

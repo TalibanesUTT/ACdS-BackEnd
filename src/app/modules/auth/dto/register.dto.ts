@@ -23,7 +23,6 @@ export class RegisterDto {
     })
     @IsNotEmpty({ message: "El correo electrónico es obligatorio" })
     @IsEmail({}, { message: "El correo electrónico no es válido" })
-    //@IsUnique('Users', 'email', { message: "El correo electrónico ya se encuentra en uso" })
     @MaxLength(100, {
         message:
             "El correo electrónico puede contener un máximo de 100 caracteres",

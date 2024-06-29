@@ -5,6 +5,7 @@ import {
     ForbiddenException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { plainToClass } from "class-transformer";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { User } from "src/app/entities/user.entity";
 import { ROLES_KEY } from "src/config/roles.decorator";
@@ -28,7 +29,11 @@ export class RolesGuard implements CanActivate {
             throw new ForbiddenException("Sesión invalida");
         }
 
-        const hasRole = requiredRoles.some((role) => user.role.value == role);
+        const serializedUser = plainToClass(User, user);
+
+        const hasRole = requiredRoles.some(
+            (role) => serializedUser.role == role,
+        );
 
         if (!hasRole) {
             throw new ForbiddenException("Acceso denegado");
