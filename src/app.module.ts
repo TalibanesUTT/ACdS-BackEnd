@@ -13,6 +13,7 @@ import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { AllExceptionFilter } from "./config/exception.filter";
 import { JwtAuthGuard } from "./app/modules/auth/jwt-auth.guard";
 import { RolesGuard } from "./common/roles.guard";
+import { UserManagementModule } from './app/modules/user-management/user-management.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { RolesGuard } from "./common/roles.guard";
         AuthModule,
         UsersModule,
         SeederModule,
+        UserManagementModule,
     ],
     controllers: [AppController],
     providers: [
