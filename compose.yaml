@@ -4,15 +4,18 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app:cached
+      - ./src:/app/src:cached
+      - /app/node_modules
     container_name: acds-nestjs
     environment:
       - DATABASE_HOST=mysql
       - DATABASE_PORT=3306
       - DATABASE_USER=root
       - DATABASE_PASSWORD=docker
-      - DATABASE_NAME=ACdS_DB 
-    command: sh -c "npm install && npm run start:debug"
+      - DATABASE_NAME=ACdS_DB
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:8.0
@@ -21,4 +24,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: docker
       MYSQL_DATABASE: ACdS_DB
-    container_name: acds-mysql
+    container_name: acds-mysq
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
