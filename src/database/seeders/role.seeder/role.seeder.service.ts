@@ -20,7 +20,9 @@ export class RoleSeederService extends BaseSeederService<Role> {
         return entity.value;
     }
 
-    protected get data(): DeepPartial<Role>[] {
-        return Object.values(RoleEnum).map((value) => ({ value }));
+    protected get data(): Promise<DeepPartial<Role>[]> {
+        return Promise.resolve(
+            Object.values(RoleEnum).map((value) => ({ value })),
+        );
     }
 }

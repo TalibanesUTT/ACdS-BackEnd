@@ -4,7 +4,6 @@ import {
     IsString,
     IsEmail,
     IsBoolean,
-    IsDateString,
     IsEnum,
 } from "class-validator";
 import { RoleEnum } from "src/app/entities/role.entity";
@@ -36,7 +35,7 @@ export class UpdateUserDto {
 
     @ApiPropertyOptional({
         description: "The phone number of the user",
-        example: "+1234567890",
+        example: "1234567890",
     })
     @IsOptional()
     @IsString()
@@ -50,42 +49,10 @@ export class UpdateUserDto {
     @IsString()
     password?: string;
 
-    @ApiPropertyOptional({
-        description: "The verification code of the user",
-        example: "123456",
-    })
-    @IsOptional()
-    @IsString()
-    verificationCode?: string;
-
-    @ApiPropertyOptional({
-        description: "Is the email confirmed?",
-        example: true,
-    })
-    @IsOptional()
-    @IsBoolean()
-    emailConfirmed?: boolean;
-
-    @ApiPropertyOptional({
-        description: "Is the phone confirmed?",
-        example: true,
-    })
-    @IsOptional()
-    @IsBoolean()
-    phoneConfirmed?: boolean;
-
     @ApiPropertyOptional({ description: "Is the user active?", example: true })
     @IsOptional()
     @IsBoolean()
     active?: boolean;
-
-    @ApiPropertyOptional({
-        description: "The creation date of the user",
-        example: "2023-06-28T00:00:00.000Z",
-    })
-    @IsOptional()
-    @IsDateString()
-    createDate?: Date;
 
     @ApiPropertyOptional({
         description: "The role of the user",
@@ -93,6 +60,10 @@ export class UpdateUserDto {
         example: RoleEnum.ADMIN,
     })
     @IsOptional()
-    @IsEnum(RoleEnum)
+    @IsEnum(RoleEnum, {
+        message: `Rol inválido, el rol debería ser alguno de los siguientes valores: ${Object.values(
+            RoleEnum,
+        ).join(", ")}`,
+    })
     role?: RoleEnum; // Assuming role is referenced by ID
 }
