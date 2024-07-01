@@ -15,7 +15,7 @@ export abstract class BaseSeederService<T> {
      * Obtiene los datos a cargar para la entidad T.
      * @returns {DeepPartial<T>[]} Arreglo de datos a sembrar.
      */
-    protected abstract get data(): DeepPartial<T>[];
+    protected abstract get data(): Promise<DeepPartial<T>[]>;
 
     /**
      * Realiza el sembrado de datos en la base de datos.
@@ -31,7 +31,7 @@ export abstract class BaseSeederService<T> {
         );
 
         // Filtra los datos a insertar para incluir solo aquellos que no existen en la base de datos.
-        const newEntities = this.data.filter(
+        const newEntities = (await this.data).filter(
             (entity) => !existingSet.has(this.getIdentity(entity)),
         );
 

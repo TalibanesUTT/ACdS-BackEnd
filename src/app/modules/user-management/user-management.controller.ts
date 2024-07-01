@@ -5,10 +5,15 @@ import {
     Param,
     ParseIntPipe,
     Put,
+    UseGuards,
 } from "@nestjs/common";
 import { SignedUrlService } from "src/app/services/signed-url/signed-url.service";
 import { UserManagementService } from "./user-management.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { RoleEnum } from "src/app/entities/role.entity";
+import { Roles } from "src/config/roles.decorator";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { SignedUrlGuard } from "src/common/signed.guard";
 
 @Controller("user-management")
 export class UserManagementController {
@@ -18,6 +23,8 @@ export class UserManagementController {
     ) {}
 
     @Get("users")
+    @ApiBearerAuth()
+    @Roles(RoleEnum.ROOT)
     async getUsers() {
         // Retrieve all users
         const users = await this.service.getUsers();
@@ -26,8 +33,8 @@ export class UserManagementController {
         const usersWithSignedUrls = await Promise.all(
             users.map(async (user) => ({
                 ...user,
-                updateURL: this.signedURLService.createSignedUrl(
-                    `user-management/users/${user.id}`,
+                updateURL: this.signedURLService.signExistingUrl(
+                    `user-management/${user.id}`,
                     {
                         sub: user.id,
                     },
@@ -39,21 +46,19 @@ export class UserManagementController {
     }
 
     @Put(":id")
+    @ApiBearerAuth()
+    @ApiQuery({ name: "token", type: String, required: true })
+    @Roles(RoleEnum.ROOT)
+    @UseGuards(SignedUrlGuard)
     async updateUser(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatedData: UpdateUserDto,
     ) {
         // Update user
         const updatedUser = await this.service.updateUser(id, updatedData);
-
-        // Generate and attach signed URL for the updated user
-        const updatedUserWithSignedUrl = {
-            ...updatedUser, // Spread user properties
-        };
-
         return {
             message: "Usuario actualizado",
-            user: updatedUserWithSignedUrl,
+            user: updatedUser,
         };
     }
 }

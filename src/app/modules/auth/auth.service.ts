@@ -42,12 +42,16 @@ export class AuthService {
     async register(data: registerData): Promise<ApiResponse<User>> {
         const { email, password, phone, passwordConfirmation, ...rest } = data;
 
-        const existingUserByEmail = await this.userRepository.findOneBy({ email });
+        const existingUserByEmail = await this.userRepository.findOneBy({
+            email,
+        });
 
         if (existingUserByEmail) {
-            throw new BadRequestException("El correo electrónico ya se encuentra en uso.");
+            throw new BadRequestException(
+                "El correo electrónico ya se encuentra en uso.",
+            );
         }
-        
+
         if (password !== passwordConfirmation) {
             throw new BadRequestException("Las contraseñas no coinciden.");
         }
@@ -66,21 +70,34 @@ export class AuthService {
         if (newUser) {
             const emailUrl = this.signedUrlService.createSignedUrl(
                 MailConstants.EndpointVerifyEmail,
-                { sub: newUser.id, email: newUser.email, type: 'email-verification'}
+                {
+                    sub: newUser.id,
+                    email: newUser.email,
+                    type: "email-verification",
+                },
             );
             const phoneUrl = this.signedUrlService.createSignedUrl(
-                MailConstants.EndpointVerifyPhone, 
-                { sub: newUser.id, phone: newUser.phoneNumber, type: 'phone-verification'}
+                MailConstants.EndpointVerifyPhone,
+                {
+                    sub: newUser.id,
+                    phone: newUser.phoneNumber,
+                    type: "phone-verification",
+                },
             );
 
-            await this.mailerService.sendMail(newUser.email, MailConstants.SubjectVerificationMail, 'verify-email', { url: emailUrl })
-            
+            await this.mailerService.sendMail(
+                newUser.email,
+                MailConstants.SubjectVerificationMail,
+                "verify-email",
+                { url: emailUrl },
+            );
+
             return {
                 statusCode: 201,
                 message: "Usuario registrado correctamente.",
                 data: newUser,
-                url: phoneUrl
-            }
+                url: phoneUrl,
+            };
         }
     }
 }

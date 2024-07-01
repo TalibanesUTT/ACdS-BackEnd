@@ -21,6 +21,13 @@ export class SignedUrlService {
         return `${this.appUrl}/signed-url/verify/${endpoint}?token=${token}`;
     }
 
+    signExistingUrl(url: string, payload: JwtPayload): string {
+        const token = jwt.sign(payload, this.jwtSecret, {
+            expiresIn: this.expirationTime,
+        });
+        return `${url}?token=${token}`;
+    }
+
     verifySignedUrl(token: string): JwtPayload | null {
         try {
             const payload = jwt.verify(

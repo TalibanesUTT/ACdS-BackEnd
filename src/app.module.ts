@@ -25,6 +25,7 @@ import { SeederModule } from "./database/seeders/seeder.module";
             isGlobal: true,
         }),
         CustomConfigModule,
+
         TypeOrmModule.forRootAsync({
             imports: [CustomConfigModule],
             inject: [CustomConfigService],
