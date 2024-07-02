@@ -26,7 +26,7 @@ export class UserSeederService extends BaseSeederService<User> {
                 name: "John",
                 lastName: "Doe",
                 email: `john.doe@${role.value.toLowerCase()}.com`,
-                password: bcrypt.hashSync("Contraseña123!", 10),
+                password: bcrypt.hashSync("Masterkey$123", 10),
                 phoneNumber: "1234567892",
                 role: role,
                 active: true,

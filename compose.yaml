@@ -4,7 +4,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./src:/app/src:cached
+      - ./src:/app/src:rw
       - /app/node_modules
     container_name: acds-nestjs
     environment:
