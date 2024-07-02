@@ -1,30 +1,20 @@
-import {
-    Controller,
-    Get,
-    Query,
-    HttpException,
-    HttpStatus,
-    Req,
-    Res,
-} from "@nestjs/common";
+import { Controller, Get, Query, HttpException, HttpStatus, Req, Res, Inject, forwardRef } from "@nestjs/common";
 import { MailConstants } from "src/constants/mail-constants";
 import { Request } from "express";
 import { SignedUrlService } from "./signed-url.service";
 import { UsersService } from "src/app/modules/users/users.service";
 import { User } from "src/app/entities/user.entity";
-import { RandomCodeService } from "../random-code/random-code.service";
 import * as bcrypt from "bcrypt";
-import { VonageService } from "../vonage/vonage.service";
-import { TextConstants } from "src/constants/text-constants";
 import { Response } from "express";
+import { AuthService } from "src/app/modules/auth/auth.service";
 
 @Controller("signed-url")
 export class SignedUrlController {
     constructor(
         private readonly signedUrlService: SignedUrlService,
         private readonly usersService: UsersService,
-        private readonly randomCodeService: RandomCodeService,
-        private readonly vonageService: VonageService,
+        @Inject(forwardRef(() => AuthService))
+        private readonly authService: AuthService,
     ) {}
 
     @Get("verify/:action")
@@ -54,6 +44,9 @@ export class SignedUrlController {
             case MailConstants.EndpointVerifyPhone:
                 await this.verifyPhone(user, code, res);
                 break;
+            case MailConstants.EndpointMultiFactor:
+                await this.multiFactorAuth(user, code, res);
+                break;
             default:
                 throw new HttpException(
                     "Acción inválida",
@@ -64,13 +57,7 @@ export class SignedUrlController {
 
     async verifyEmail(user: User, @Res() res: Response) {
         if (!user.phoneConfirmed) {
-            const verificationCode =
-                this.randomCodeService.generateRandomCode(6);
-            user.verificationCode = await bcrypt.hash(verificationCode, 10);
-
-            const text =
-                TextConstants.TextVerificationCodeMessage + verificationCode;
-            await this.vonageService.sendSms(user.phoneNumber, text);
+            this.authService.sendVerificationCode(user);
         } else {
             user.active = true;
         }
@@ -103,5 +90,29 @@ export class SignedUrlController {
         await this.usersService.save(user);
 
         return res.json({ message: "Teléfono verificado correctamente" });
+    }
+
+    async multiFactorAuth(user: User, code: string, @Res() res: Response) {
+        if (!code || code.length !== 6) {
+            throw new HttpException("Código inválido", HttpStatus.BAD_REQUEST);
+        }
+
+        const isValid = await bcrypt.compare(code, user.verificationCode);
+        if (!isValid) {
+            throw new HttpException(
+                "Código de verificación incorrecto",
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        user.verificationCode = null;
+        await this.usersService.save(user);
+        const token = await this.authService.generateToken(user);
+
+        return res.json({ 
+            message: "Autenticación de dos factores exitosa",
+            token: token.access_token,
+         });
+        
     }
 }

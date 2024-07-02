@@ -32,10 +32,7 @@ import { SeederModule } from "./database/seeders/seeder.module";
             useFactory: async (configService: CustomConfigService) => {
                 const dataSource = createDataSource(configService);
                 await dataSource.initialize();
-                return {
-                    ...dataSource.options,
-                    migrations: ["dist/database/migrations/*.js"],
-                };
+                return dataSource.options;
             },
         }),
         SignedUrlModule,

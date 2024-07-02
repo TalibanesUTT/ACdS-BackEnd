@@ -12,7 +12,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
 
     handleRequest<TUser = any>(err: any, user: any): TUser {
         if (err || !user) {
-            return null; // Return null if there is no user, making it non-blocking
+            return null;
         }
         return user;
     }
