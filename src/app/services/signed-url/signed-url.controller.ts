@@ -1,4 +1,12 @@
-import { Controller, Get, Query, HttpException, HttpStatus, Req, Res } from "@nestjs/common";
+import {
+    Controller,
+    Get,
+    Query,
+    HttpException,
+    HttpStatus,
+    Req,
+    Res,
+} from "@nestjs/common";
 import { MailConstants } from "src/constants/mail-constants";
 import { Request } from "express";
 import { SignedUrlService } from "./signed-url.service";
@@ -9,7 +17,6 @@ import * as bcrypt from "bcrypt";
 import { VonageService } from "../vonage/vonage.service";
 import { TextConstants } from "src/constants/text-constants";
 import { Response } from "express";
-import { ApiResponse } from "src/app/interfaces/api-response.interface";
 
 @Controller("signed-url")
 export class SignedUrlController {
@@ -22,16 +29,19 @@ export class SignedUrlController {
 
     @Get("verify/:action")
     async verifySignedUrl(
-        @Req() request: Request, 
+        @Req() request: Request,
         @Query("token") token: string,
         @Query("code") code: string,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
         const payload = this.signedUrlService.verifySignedUrl(token);
         const action = request.params.action;
 
         if (!payload) {
-            throw new HttpException("Token inválido o expirado", HttpStatus.BAD_REQUEST);
+            throw new HttpException(
+                "Token inválido o expirado",
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
         const userId = payload.sub;
@@ -44,18 +54,22 @@ export class SignedUrlController {
             case MailConstants.EndpointVerifyPhone:
                 await this.verifyPhone(user, code, res);
                 break;
-            default: 
-                throw new HttpException("Acción inválida", HttpStatus.BAD_REQUEST);
+            default:
+                throw new HttpException(
+                    "Acción inválida",
+                    HttpStatus.BAD_REQUEST,
+                );
         }
-        
     }
 
     async verifyEmail(user: User, @Res() res: Response) {
         if (!user.phoneConfirmed) {
-            const verificationCode = this.randomCodeService.generateRandomCode(6);
+            const verificationCode =
+                this.randomCodeService.generateRandomCode(6);
             user.verificationCode = await bcrypt.hash(verificationCode, 10);
 
-            const text = TextConstants.TextVerificationCodeMessage + verificationCode;
+            const text =
+                TextConstants.TextVerificationCodeMessage + verificationCode;
             await this.vonageService.sendSms(user.phoneNumber, text);
         } else {
             user.active = true;
@@ -64,7 +78,7 @@ export class SignedUrlController {
         user.emailConfirmed = true;
         await this.usersService.save(user);
 
-        return res.render("success-verification")
+        return res.render("success-verification");
     }
 
     async verifyPhone(user: User, code: string, @Res() res: Response) {
@@ -74,7 +88,10 @@ export class SignedUrlController {
 
         const isValid = await bcrypt.compare(code, user.verificationCode);
         if (!isValid) {
-            throw new HttpException("Código de verificación incorrecto", HttpStatus.BAD_REQUEST);
+            throw new HttpException(
+                "Código de verificación incorrecto",
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
         user.phoneConfirmed = true;
@@ -84,7 +101,7 @@ export class SignedUrlController {
         }
 
         await this.usersService.save(user);
-        
+
         return res.json({ message: "Teléfono verificado correctamente" });
     }
 }

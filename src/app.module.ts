@@ -8,7 +8,6 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./app/modules/auth/auth.module";
 import { UsersModule } from "./app/modules/users/users.module";
-import { SeederModule } from "./database/seeders/seeder.module";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AllExceptionFilter } from "./config/exception.filter";
 import { JwtAuthGuard } from "./app/modules/auth/jwt-auth.guard";
@@ -18,6 +17,7 @@ import { SignedUrlModule } from "./app/services/signed-url/signed-url.module";
 import { MailerModule } from "./app/services/mailer/mailer.module";
 import { RandomCodeModule } from "./app/services/random-code/random-code.module";
 import { VonageModule } from "./app/services/vonage/vonage.module";
+import { SeederModule } from "./database/seeders/seeder.module";
 
 @Module({
     imports: [
@@ -25,16 +25,19 @@ import { VonageModule } from "./app/services/vonage/vonage.module";
             isGlobal: true,
         }),
         CustomConfigModule,
+
         TypeOrmModule.forRootAsync({
             imports: [CustomConfigModule],
             inject: [CustomConfigService],
             useFactory: async (configService: CustomConfigService) => {
                 const dataSource = createDataSource(configService);
                 await dataSource.initialize();
-                return dataSource.options;
+                return {
+                    ...dataSource.options,
+                    migrations: ["dist/database/migrations/*.js"],
+                };
             },
         }),
-        TypeOrmModule.forFeature([]),
         SignedUrlModule,
         MailerModule,
         RandomCodeModule,
