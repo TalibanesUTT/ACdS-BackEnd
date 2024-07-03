@@ -50,13 +50,16 @@ export class AuthController {
             },
         },
     })
-    async existsUser(@Body() req: { email: string }): Promise<boolean> {
+    async existsUser(@Body() req: { email: string }): Promise<object> {
         if (!req.email) {
-            return false
+            return {
+                exists: false,
+            };
         }
-        
         const user = !!(await this.usersService.findByEmail(req.email));
-        return user;
+        return {
+            exists: user,
+        };
     }
 
     @Get("resendEmailVerification/:userId")
