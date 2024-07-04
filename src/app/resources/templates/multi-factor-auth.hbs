@@ -1,9 +1,69 @@
-<html>
-<head>
-  <title>Autenticación de Múltiples Factores</title>
-</head>
-<body>
-  <h1>Autenticación de Múltiples Factores</h1>
-  <p>Por favor, introduce el código de verificación de tu aplicación de autenticación:</p>
-  <h1>{{ code }}</h1>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bienvenido a ACdS Integration</title>
+        <style>
+            body { width: 100% !important; margin: 0; padding: 0;
+            -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; } table
+            { border-spacing: 0; border-collapse: collapse; table-layout: fixed;
+            margin: auto; } img { border: 0; -ms-interpolation-mode: bicubic; }
+            a { text-decoration: none; } a[x-apple-data-detectors] { color:
+            inherit !important; text-decoration: none !important; }
+            .email-container { width: 100%; max-width: 600px; margin: auto;
+            border: 1px solid #e0e0e0; } .column1 { background-color: #f2494e;
+            text-align: center; padding: 40px 20px; } .column2 { padding: 20px;
+            text-align: center; } h1 { color: white; font-size: 24px;
+            font-family: Arial, sans-serif; } p { color: white; font-size: 16px;
+            font-family: Arial, sans-serif; line-height: 1.4; } .button {
+            display: inline-block; background-color: #bc0505; color: white;
+            text-align: center; font-size: 18px; padding: 15px 30px;
+            border-radius: 100px; border: none; } .button:hover {
+            background-color: #f2494e; cursor: pointer; } .containerCode {
+            background: white; padding: 20px; border-radius: 8px; box-shadow: 0
+            0 10px rgba(0, 0, 0, 0.1); text-align: center; } .code { width:
+            100%; margin: 20px 0; } .block { display: inline-block; width: 60px;
+            height: 60px; border: 1px solid #ccc; border-radius: 4px;
+            line-height: 60px; font-size: 24px; font-weight: bold;
+            background-color: #f9f9f9; margin: 0 5px; } footer { text-align:
+            center; margin-top: 20px; } footer p { color: black; font-size:
+            medium; margin: 5px 0; } @media screen and (max-width: 600px) { h1 {
+            font-size: 20px; } p { font-size: 14px; } .button { font-size: 16px;
+            padding: 10px 20px; } }
+        </style>
+    </head>
+    <body>
+        <center>
+            <table role="presentation" class="email-container">
+                <tr>
+                    <td class="column1">
+                        <h1>¡Bienvenido administrador!</h1>
+                        <p>
+                            Este es su código de verificación de un solo uso.
+                            Por favor, ingréselo en la aplicación para poder
+                            iniciar sesión.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="column2">
+                        <div class="containerCode">
+                            <div class="code">
+                                <div class="block">{{code.[0]}}</div>
+                                <div class="block">{{code.[1]}}</div>
+                                <div class="block">{{code.[2]}}</div>
+                                <div class="block">{{code.[3]}}</div>
+                                <div class="block">{{code.[4]}}</div>
+                                <div class="block">{{code.[5]}}</div>
+                            </div>
+                        </div>
+                        <footer>
+                            <p>@ACdS Integration 2021. Todos los derechos
+                                reservados.</p>
+                        </footer>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </body>
 </html>
