@@ -7,10 +7,10 @@ on:
 
 jobs:
     pull:
-        runs-on: rockylinux/9
+        runs-on: ubuntu-latest
         steps:
             - name: SSH
-              uses: appleboy/ssh-action@v0.1.2
+              uses: appleboy/ssh-action@v1.0.3
               with:
                 host: ${{ secrets.HOST }}
                 username: ${{ secrets.USERNAME }}
