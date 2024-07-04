@@ -19,6 +19,6 @@ jobs:
                     
                 script: 
                      su ${{secrets.APP_USER}}
-                     cd ${{secrets.WORK_DIR}}
+                     sudo cd ${{secrets.WORK_DIR}}
                      git checkout ${{secrets.MAIN_BRANCH}}
                      git pull
