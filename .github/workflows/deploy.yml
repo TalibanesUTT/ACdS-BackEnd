@@ -13,7 +13,7 @@ jobs:
               uses: appleboy/ssh-action@v1.0.3
               with:
                 host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}
+                username: ${{ secrets.APP_USER }}
                 key: ${{ secrets.KEY }}
                 port: ${{ secrets.PORT }}
                     
@@ -21,5 +21,4 @@ jobs:
                      ls -la
                      cd ${{secrets.WORK_DIR}}
                      ls -la
-                     sudo su ${{secrets.APP_USER}}
                      git pull
