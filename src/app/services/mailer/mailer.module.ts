@@ -5,6 +5,8 @@ import { CustomConfigService } from "src/config/custom-config.service";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { MailerService } from "./mailer.service";
 import { join } from "path";
+import { BullModule } from "@nestjs/bullmq";
+import { MailProcessor } from "./mail.processor";
 
 @Module({
     imports: [
@@ -33,9 +35,12 @@ import { join } from "path";
                 },
             }),
         }),
+        BullModule.registerQueue({
+            name: "mail",
+        }),
     ],
-    providers: [MailerService],
-    exports: [MailerService],
+    providers: [MailProcessor, MailerService],
+    exports: [MailerService, BullModule],
 })
 
 export class MailerModule {}

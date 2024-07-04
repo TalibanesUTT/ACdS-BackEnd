@@ -1,0 +1,21 @@
+name: Test Access
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+    pull:
+        runs-on: rockylinux/9
+        steps:
+            - name: SSH
+              uses: appleboy/ssh-action@v0.1.2
+              with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USERNAME }}
+                key: ${{ secrets.KEY }}
+                port: ${{ secrets.PORT }}
+                    
+                script: 
+                     pwd

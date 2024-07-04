@@ -60,4 +60,12 @@ export class CustomConfigService {
     get vonageApiSecret(): string {
         return this.configService.get<string>("VONAGE_API_SECRET");
     }
+
+    get redisHost(): string {
+        return this.configService.get<string>("REDIS_HOST");
+    }
+
+    get redisPort(): number {
+        return this.configService.get<number>("REDIS_PORT");
+    }
 }
