@@ -18,7 +18,7 @@ jobs:
                 port: ${{ secrets.PORT }}
                     
                 script: 
-                     su ${{secrets.APP_USER}}
-                     sudo cd ${{secrets.WORK_DIR}}
-                     git checkout ${{secrets.MAIN_BRANCH}}
+                     ls -la
+                     cd ${{secrets.WORK_DIR}}
+                     su mngr
                      git pull
