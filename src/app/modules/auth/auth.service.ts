@@ -14,6 +14,7 @@ import { VonageService } from "src/app/services/vonage/vonage.service";
 import { TextConstants } from "src/constants/text-constants";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { UsersService } from "../users/users.service";
+import { CustomConfigService } from "src/config/custom-config.service";
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
         private readonly mailerService: MailerService,
         private readonly randomCodeService: RandomCodeService,
         private readonly vonageService: VonageService,
+        private readonly customConfigService: CustomConfigService,
         private jwtService: JwtService,
         private usersService: UsersService,
         @InjectRepository(User)
@@ -61,11 +63,12 @@ export class AuthService {
             { sub: user.id, email: user.email, type: 'multi-factor-auth' }
         );
 
-        await this.mailerService.sendMail(
+        await this.mailerService.addMailJob(
             user.email, 
             MailConstants.SubjectMultiFactorAuthMail, 
             'multi-factor-auth', 
-            { url: emailUrl, name: user.name, code: verificationCode }
+            { url: emailUrl, name: user.name, code: verificationCode },
+            10000
         );
 
         return {
@@ -116,16 +119,18 @@ export class AuthService {
     }
 
     async sendEmailVerification(user: User) {
+        const resendUrl = this.customConfigService.appUrl + '/auth/resendEmailVerification/' + user.id;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
             { sub: user.id, email: user.email, type: 'email-verification'}
         );
 
-        await this.mailerService.sendMail(
+        await this.mailerService.addMailJob(
             user.email, 
             MailConstants.SubjectVerificationMail, 
             'verify-email', 
-            { url: emailUrl, name: user.name, userId: user.id}
+            { url: emailUrl, name: user.name, resendUrl: resendUrl },
+            10000
         );
     }
 
@@ -143,7 +148,11 @@ export class AuthService {
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
 
         const text = TextConstants.TextVerificationCodeMessage + verificationCode;
-        await this.vonageService.sendSms(user.phoneNumber, text);
+        await this.vonageService.addSmsJob(
+            user.phoneNumber, 
+            text,
+            12000
+        );
         await this.userRepository.save(user);
     }
 }

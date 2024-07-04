@@ -1,12 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { Vonage } from "@vonage/server-sdk";
 import { CustomConfigService } from "src/config/custom-config.service";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 
 @Injectable()
 export class VonageService {
     private vonage: Vonage;
 
-    constructor(private readonly configService: CustomConfigService) {
+    constructor(
+        @InjectQueue("sms")
+        private readonly smsQueue: Queue,
+        private readonly configService: CustomConfigService
+    ) {
         this.vonage = new Vonage({
             apiKey: this.configService.vonageApiKey,
             apiSecret: this.configService.vonageApiSecret,
@@ -24,4 +30,11 @@ export class VonageService {
         }
     }
 
+    async addSmsJob(to: string, text: string, delay: number = 0) {
+        await this.smsQueue.add(
+            "send-sms",
+            { to, text },
+            { delay }
+        );
+    }
 }

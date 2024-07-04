@@ -18,6 +18,8 @@ import { MailerModule } from "./app/services/mailer/mailer.module";
 import { RandomCodeModule } from "./app/services/random-code/random-code.module";
 import { VonageModule } from "./app/services/vonage/vonage.module";
 import { SeederModule } from "./database/seeders/seeder.module";
+import { BullModule } from "@nestjs/bullmq";
+import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
 
 @Module({
     imports: [
@@ -25,7 +27,6 @@ import { SeederModule } from "./database/seeders/seeder.module";
             isGlobal: true,
         }),
         CustomConfigModule,
-
         TypeOrmModule.forRootAsync({
             imports: [CustomConfigModule],
             inject: [CustomConfigService],
@@ -35,6 +36,16 @@ import { SeederModule } from "./database/seeders/seeder.module";
                 return dataSource.options;
             },
         }),
+        BullModule.forRootAsync({
+            imports: [CustomConfigModule],
+            inject: [CustomConfigService],
+            useFactory: async (configService: CustomConfigService) => ({
+                connection: {
+                    host: configService.redisHost,
+                    port: configService.redisPort,
+                },
+            }),
+        }),
         SignedUrlModule,
         MailerModule,
         RandomCodeModule,
@@ -43,6 +54,7 @@ import { SeederModule } from "./database/seeders/seeder.module";
         UsersModule,
         SeederModule,
         UserManagementModule,
+        BullBoardModule,
     ],
     controllers: [AppController],
     providers: [

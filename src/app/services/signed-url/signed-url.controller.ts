@@ -7,6 +7,7 @@ import { User } from "src/app/entities/user.entity";
 import * as bcrypt from "bcrypt";
 import { Response } from "express";
 import { AuthService } from "src/app/modules/auth/auth.service";
+import { TextConstants } from "src/constants/text-constants";
 
 @Controller("signed-url")
 export class SignedUrlController {
@@ -65,7 +66,8 @@ export class SignedUrlController {
         user.emailConfirmed = true;
         await this.usersService.save(user);
 
-        return res.render("success-verification");
+        const text = TextConstants.TextVerificationSuccessForNewUser;
+        return res.render("success-verification", { text: text });
     }
 
     async verifyPhone(user: User, code: string, @Res() res: Response) {
