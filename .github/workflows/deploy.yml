@@ -19,8 +19,9 @@ jobs:
                     
                 script: |
                      ls -la
+                     eval $(ssh-agent -s)
+                     echo "${{secrets.KEY}}" | tr -d '\r' | ssh-add - <<< "${{secrets.PASSPHRASE}}"
+                     ssh-add -l
                      cd ${{secrets.WORK_DIR}}
                      ls -la
                      git pull
-                     ${{secrets.PASSPHRASE}}
-                     
