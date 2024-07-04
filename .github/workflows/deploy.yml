@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-    pull:
+    Access-and-Pull:
         runs-on: ubuntu-latest
         steps:
             - name: SSH
