@@ -16,12 +16,15 @@ jobs:
                 username: ${{ secrets.APP_USER }}
                 key: ${{ secrets.KEY }}
                 port: ${{ secrets.PORT }}
-                    
-                script: |
-                     ls -la
-                     eval $(ssh-agent -s)
-                     echo "${{secrets.KEY}}" | tr -d '\r' | ssh-add - <<< "${{secrets.PASSPHRASE}}"
-                     ssh-add -l
-                     cd ${{secrets.WORK_DIR}}
-                     ls -la
-                     git pull
+                
+            - name: Checkout repository
+              uses: actions/checkout@v2
+      
+            - name: List directory contents
+              run: ls -la
+      
+            - name: Change to work directory
+              run: cd ${{ secrets.WORK_DIR }}
+      
+            - name: Git pull
+              run: git pull origin main
