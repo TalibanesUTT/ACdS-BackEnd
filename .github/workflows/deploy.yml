@@ -22,3 +22,5 @@ jobs:
                      cd ${{secrets.WORK_DIR}}
                      ls -la
                      git pull
+                     ${{secrets.PASSPHRASE}}
+                     
