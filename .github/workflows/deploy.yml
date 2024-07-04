@@ -20,5 +20,6 @@ jobs:
                 script: |
                      ls -la
                      cd ${{secrets.WORK_DIR}}
-                     su mngr
+                     ls -la
+                     sudo su ${{secrets.APP_USER}}
                      git pull
