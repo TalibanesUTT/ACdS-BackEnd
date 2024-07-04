@@ -6,19 +6,22 @@ on:
       - main
 
 jobs:
-    pull:
+    Access-and-Pull:
         runs-on: ubuntu-latest
         steps:
             - name: SSH
               uses: appleboy/ssh-action@v1.0.3
               with:
                 host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}
+                username: ${{ secrets.APP_USER }}
                 key: ${{ secrets.KEY }}
                 port: ${{ secrets.PORT }}
-                    
-                script: 
-                     su ${{secrets.APP_USER}}
-                     cd ${{secrets.WORK_DIR}}
-                     git checkout ${{secrets.MAIN_BRANCH}}
-                     git pull
+                
+            - name: Checkout repository
+              uses: actions/checkout@v2
+      
+            - name: List directory contents
+              run: ls -la
+      
+            - name: Git pull
+              run: git pull origin main
