@@ -22,4 +22,5 @@ jobs:
                   ssh-add -l
                   ls -la
                   cd ${{ secrets.WORK_DIR }}
+                  ls -la
                   git pull
