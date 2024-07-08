@@ -9,7 +9,8 @@ import { SeederService } from "./database/seeders/seeder.service";
 import { AllExceptionFilter } from "./config/exception.filter";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import * as hbs from 'express-handlebars';
-import { extname, join } from "path";
+import { join } from "path";
+import * as express from 'express';
 
 async function bootstrap() {
     configDotenv();
@@ -29,6 +30,8 @@ async function bootstrap() {
             forbidNonWhitelisted: true, // Throw error if unknown properties are found
         }),
     );
+
+    app.use('/admin/queues/static', express.static(join(__dirname, '..', 'public', 'static')));
 
     app.useGlobalFilters(new AllExceptionFilter());
 

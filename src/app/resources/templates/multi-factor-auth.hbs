@@ -1,10 +1,7 @@
-<html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Bienvenido a ACdS Integration</title>
-        <style>
-            body { width: 100% !important; margin: 0; padding: 0;
+<html>
+<head>
+    <style>
+         body { width: 100% !important; margin: 0; padding: 0;
             -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; } table
             { border-spacing: 0; border-collapse: collapse; table-layout: fixed;
             margin: auto; } img { border: 0; -ms-interpolation-mode: bicubic; }
@@ -30,40 +27,38 @@
             medium; margin: 5px 0; } @media screen and (max-width: 600px) { h1 {
             font-size: 20px; } p { font-size: 14px; } .button { font-size: 16px;
             padding: 10px 20px; } }
-        </style>
-    </head>
-    <body>
-        <center>
-            <table role="presentation" class="email-container">
-                <tr>
-                    <td class="column1">
-                        <h1>¡Bienvenido administrador!</h1>
-                        <p>
-                            Este es su código de verificación de un solo uso.
+    </style>
+</head>
+<body>
+    <center>
+        <table role="presentation" class="email-container">
+            <tr>
+                <td class="column1">
+                    <h1>¡Bienvenido administrador!</h1>
+                    <p>
+                         Este es su código de verificación de un solo uso.
                             Por favor, ingréselo en la aplicación para poder
                             iniciar sesión.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="column2">
-                        <div class="containerCode">
-                            <div class="code">
-                                <div class="block">{{code.[0]}}</div>
-                                <div class="block">{{code.[1]}}</div>
-                                <div class="block">{{code.[2]}}</div>
-                                <div class="block">{{code.[3]}}</div>
-                                <div class="block">{{code.[4]}}</div>
-                                <div class="block">{{code.[5]}}</div>
-                            </div>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="column2">
+                    <div class="containerCode">
+                        <div class="code">
+                            {{#each code}}
+                                <div class="block">{{this}}</div>
+                            {{/each}}
                         </div>
-                        <footer>
-                            <p>@ACdS Integration 2021. Todos los derechos
-                                reservados.</p>
-                        </footer>
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </body>
+                    </div>
+                    <footer>
+                        <p>
+                            @ACdS Integration 2021. Todos los derechos reservados.
+                        </p>
+                    </footer>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
 </html>

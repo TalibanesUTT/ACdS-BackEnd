@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from "@nestjs/common";
+import { ClassSerializerInterceptor, Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { CustomConfigModule } from "./config/custom-config.module";
 import { CustomConfigService } from "./config/custom-config.service";
@@ -20,6 +20,7 @@ import { VonageModule } from "./app/services/vonage/vonage.module";
 import { SeederModule } from "./database/seeders/seeder.module";
 import { BullModule } from "@nestjs/bullmq";
 import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
+import { BullBoardService } from "./app/services/bull-board/bull-board.service";
 
 @Module({
     imports: [
@@ -71,4 +72,11 @@ import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
         },
     ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    constructor(private readonly bullBoardService: BullBoardService) {}
+
+    configure(consumer: MiddlewareConsumer) {
+        const serverAdapter = this.bullBoardService.getBullBoardAdapter();
+        consumer.apply(serverAdapter.getRouter()).forRoutes("/admin/queues/ui");
+    }
+}

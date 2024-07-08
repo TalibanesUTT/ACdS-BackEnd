@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Req } from "@nestjs/common";
+import { Controller, Get, Res, Req, Next } from "@nestjs/common";
 import { BullBoardService } from "./bull-board.service";
 import { Response, Request } from "express";
 
@@ -12,8 +12,8 @@ export class BullBoardController {
     }
 
     @Get('ui/*')
-    async getBullBoardUI(@Req() req: Request, @Res() res: Response) {
+    async getBullBoardUI(@Req() req: Request, @Res() res: Response, @Next() next) {
         const serverAdapter = this.bullBoardService.getBullBoardAdapter();
-        serverAdapter.getRouter()(req, res);
+        serverAdapter.getRouter()(req, res, next);
     }
 }

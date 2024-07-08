@@ -57,17 +57,19 @@ export class AuthService {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
         await this.userRepository.save(user);
+        const codeArray = verificationCode.split('');
 
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointMultiFactor,
             { sub: user.id, email: user.email, type: 'multi-factor-auth' }
         );
 
+        console.log(codeArray);
         await this.mailerService.addMailJob(
             user.email, 
             MailConstants.SubjectMultiFactorAuthMail, 
             'multi-factor-auth', 
-            { url: emailUrl, name: user.name, code: verificationCode },
+            { code: codeArray },
             10000
         );
 
