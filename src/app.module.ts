@@ -21,6 +21,7 @@ import { SeederModule } from "./database/seeders/seeder.module";
 import { BullModule } from "@nestjs/bullmq";
 import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
 import { BullBoardService } from "./app/services/bull-board/bull-board.service";
+import { CarBrandsModule } from './app/modules/car-brands/car-brands.module';
 
 @Module({
     imports: [
@@ -56,6 +57,7 @@ import { BullBoardService } from "./app/services/bull-board/bull-board.service";
         SeederModule,
         UserManagementModule,
         BullBoardModule,
+        CarBrandsModule,
     ],
     controllers: [AppController],
     providers: [
