@@ -40,11 +40,9 @@ export class User {
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
 
-    @Exclude()
     @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
-    @Exclude()
     @Column({ type: "boolean", default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 

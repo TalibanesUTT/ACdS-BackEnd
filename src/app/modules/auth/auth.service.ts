@@ -63,8 +63,7 @@ export class AuthService {
             MailConstants.EndpointMultiFactor,
             { sub: user.id, email: user.email, type: 'multi-factor-auth' }
         );
-
-        console.log(codeArray);
+        
         await this.mailerService.addMailJob(
             user.email, 
             MailConstants.SubjectMultiFactorAuthMail, 
