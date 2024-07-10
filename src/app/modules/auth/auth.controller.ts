@@ -1,4 +1,4 @@
-import { Request, Body, Controller, Post, UseGuards, Get } from "@nestjs/common";
+import { Request, Body, Controller, Post, UseGuards, Get, Res } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -6,6 +6,7 @@ import { ApiBody } from "@nestjs/swagger";
 import { UsersService } from "../users/users.service";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
+import { Response } from "express";
 
 @Controller("auth")
 export class AuthController {
@@ -63,10 +64,12 @@ export class AuthController {
     }
 
     @Get("resendEmailVerification/:userId")
-    async resendEmailVerification(@Request() req) {
+    async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
         const user = await this.usersService.find(userId);
-        return this.authService.sendEmailVerification(user);
+        await this.authService.sendEmailVerification(user);
+
+        return res.render("new-email-verification")
     }
 
     @Get("resendVerificationCode/:userId")
