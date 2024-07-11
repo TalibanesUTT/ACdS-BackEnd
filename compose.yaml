@@ -4,7 +4,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./src:/app/src:rw
+      - ./src:/app/src:delegated
       - /app/node_modules
     container_name: acds-nestjs
     environment:
@@ -32,7 +32,7 @@ services:
       retries: 5
       start_period: 30s
   redis:
-    image: redis:6.0
+    image: redis:alpine
     ports:
       - "6379:6379"
     container_name: acds-redis
