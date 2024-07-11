@@ -16,21 +16,22 @@ export class CarBrandsService {
     ) {}
 
     async findAll(limit = 100): Promise<CarBrand[]> {
-        return this.repository.find({
+        const brands = this.repository.find({
             take: limit,
         });
+        if (!(await brands).length) {
+            throw new NotFoundException("No hay marcas de autos registradas");
+        }
+        return brands;
     }
 
     async findOne(id: number): Promise<CarBrand> {
+        console.log("id", id);
         try {
-            return this.repository.findOneByOrFail({ id });
+            return await this.repository.findOneByOrFail({ id });
         } catch (error) {
-            if (error.name === "EntityNotFoundError") {
-                throw new NotFoundException(
-                    `Auto con el id: ${id} no encontrado`,
-                );
-            }
             Logger.error(error);
+            throw new NotFoundException(`Auto no encontrado`);
         }
     }
 
@@ -50,6 +51,28 @@ export class CarBrandsService {
                 throw new BadRequestException("La marca de auto ya existe");
             }
             Logger.error(error);
+        }
+    }
+
+    async update(id: number, carBrand: CarBrand): Promise<CarBrand> {
+        const car = await this.repository.findOneBy({ id });
+
+        if (!car) {
+            throw new BadRequestException(
+                "El ID de la marca de auto no existe",
+            );
+        }
+
+        try {
+            return await this.repository.save({
+                ...car,
+                ...carBrand,
+            });
+        } catch (error) {
+            Logger.error(error);
+            throw new BadRequestException(
+                "Error al actualizar la marca de auto",
+            );
         }
     }
 }

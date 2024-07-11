@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { CarBrandsService } from "./car-brands.service";
 import { SignedUrlService } from "src/app/services/signed-url/signed-url.service";
 import { CarBrand } from "src/app/entities/car-brand.entity";
-import { CreateCarBrandDto } from "./dto/car-brand.dto";
+import { CreateCarBrandDto, UpdateCarBrandDto } from "./dto/car-brand.dto";
+import { ApiParam } from "@nestjs/swagger";
 
 @Controller("car-brands")
 export class CarBrandsController {
@@ -27,7 +28,12 @@ export class CarBrandsController {
     }
 
     @Get(":id")
-    async getCarBrand(id: number) {
+    @ApiParam({
+        name: "id",
+        type: "number",
+        description: "The id of the car brand",
+    })
+    async getCarBrand(@Param() id: number) {
         return this.carBrandsService.findOne(id);
     }
 
@@ -37,8 +43,12 @@ export class CarBrandsController {
         return this.carBrandsService.create(new CarBrand(name));
     }
 
-
     @Put(":id")
-    async 
-
+    async updateCarBrand(
+        @Body() dto: UpdateCarBrandDto,
+        @Param("id") id: number,
+    ) {
+        const name = dto.name;
+        return this.carBrandsService.update(id, new CarBrand(name));
+    }
 }
