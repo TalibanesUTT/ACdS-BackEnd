@@ -3,6 +3,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     Injectable,
+    Logger,
     UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -42,7 +43,8 @@ export class SignedUrlGuard implements CanActivate {
             }
 
             return true;
-        } catch {
+        } catch (error) {
+            Logger.error(error);
             return false;
         }
     }
