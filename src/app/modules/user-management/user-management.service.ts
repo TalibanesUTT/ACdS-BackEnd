@@ -89,4 +89,26 @@ export class UserManagementService {
             message: "Correo de recuperación de contraseña enviado correctamente"
         };
     }
+
+    async updatePassword(id: number, actualPassword: string, newPassword: string, passwordConfirmation: string) {
+        if (newPassword !== passwordConfirmation) {
+            throw new BadRequestException("Las contraseñas no coinciden");
+        }
+
+        const user = await this.userRepository.findOneBy({ id });
+
+        const isPasswordValid = await bcrypt.compare(actualPassword, user.password);
+
+        if (!isPasswordValid) {
+            throw new BadRequestException("La contraseña actual es incorrecta");
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await this.userRepository.save(user);
+
+        return {
+            statusCode: 200,
+            message: "Contraseña actualizada correctamente"
+        };
+    }
 }

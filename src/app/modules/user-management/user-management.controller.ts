@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Put, UseGuards, Post} from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Put, UseGuards, Post, HttpCode } from "@nestjs/common";
 import { SignedUrlService } from "src/app/services/signed-url/signed-url.service";
 import { UserManagementService } from "./user-management.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -55,6 +55,7 @@ export class UserManagementController {
     }
 
     @Post("recoverPassword")
+    @HttpCode(200)
     @ApiBody({
         schema: {
             type: "object",
@@ -66,5 +67,24 @@ export class UserManagementController {
     })
     async recoverPassword(@Body() req: { email: string, fromAdmin: boolean}) {
         return this.service.recoverPassword(req.email, req.fromAdmin);
+    }
+
+    @Put("updatePassword/:id")
+    @HttpCode(200)
+    @ApiBody({
+        schema: {
+            type: "object",
+            properties: {
+                actualPassword: { type: "string", example: "password" },
+                newPassword: { type: "string", example: "newPassword" },
+                passwordConfirmation: { type: "string", example: "newPassword" },
+            },
+        },
+    })
+    async updatePassword(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() req: { actualPassword: string, newPassword: string, passwordConfirmation: string },
+    ) {
+        return this.service.updatePassword(id, req.actualPassword, req.newPassword, req.passwordConfirmation);
     }
 }
