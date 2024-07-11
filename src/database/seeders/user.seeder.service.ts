@@ -22,15 +22,20 @@ export class UserSeederService extends BaseSeederService<User> {
 
     protected get data(): Promise<DeepPartial<User>[]> {
         return this.roleRepository.find().then((roles) =>
-            roles.map((role) => ({
-                name: "John",
-                lastName: "Doe",
-                email: `john.doe@${role.value.toLowerCase()}.com`,
-                password: bcrypt.hashSync("Masterkey$123", 10),
-                phoneNumber: "1234567892",
-                role: role,
-                active: true,
-            })),
+            roles.map(
+                (role) =>
+                    new User({
+                        active: true,
+                        role: role,
+                        name: "john",
+                        lastName: "doe",
+                        email: `john.doe@${role.value.toLowerCase()}.com`,
+                        password: bcrypt.hashSync("Masterkey$123", 10),
+                        emailConfirmed: true,
+                        phoneConfirmed: true,
+                        phoneNumber: "1234567890",
+                    }),
+            ),
         );
     }
 
