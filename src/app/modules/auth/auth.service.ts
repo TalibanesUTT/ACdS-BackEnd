@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Inject, forwardRef } from "@nestjs/common";
+import {
+    BadRequestException,
+    Injectable,
+    Inject,
+    forwardRef,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/app/entities/user.entity";
 import * as bcrypt from "bcrypt";
@@ -15,6 +20,8 @@ import { TextConstants } from "src/constants/text-constants";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { UsersService } from "../users/users.service";
 import { CustomConfigService } from "src/config/custom-config.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class AuthService {
@@ -25,6 +32,7 @@ export class AuthService {
         private readonly randomCodeService: RandomCodeService,
         private readonly vonageService: VonageService,
         private readonly customConfigService: CustomConfigService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private jwtService: JwtService,
         private usersService: UsersService,
         @InjectRepository(User)
@@ -33,7 +41,12 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ email });
-        if (!user || !user.active || !user.emailConfirmed || !user.phoneConfirmed) {
+        if (
+            !user ||
+            !user.active ||
+            !user.emailConfirmed ||
+            !user.phoneConfirmed
+        ) {
             return null;
         }
 
@@ -44,32 +57,38 @@ export class AuthService {
 
     async generateToken(user: User) {
         const payload: JwtPayload = { email: user.email, sub: user.id };
+        const token = this.jwtService.sign(payload);
+
+        this.whitelistToken(token);
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token: token,
         };
     }
 
     requireMultiFactorAuth(user: User): boolean {
-        return user.role.value === RoleEnum.ADMIN || user.role.value === RoleEnum.ROOT;
+        return (
+            user.role.value === RoleEnum.ADMIN ||
+            user.role.value === RoleEnum.ROOT
+        );
     }
 
     async sendMultiFactorAuthEmail(user: User): Promise<ApiResponse<User>> {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
         await this.userRepository.save(user);
-        const codeArray = verificationCode.split('');
+        const codeArray = verificationCode.split("");
 
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointMultiFactor,
-            { sub: user.id, email: user.email, type: 'multi-factor-auth' }
+            { sub: user.id, email: user.email, type: "multi-factor-auth" },
         );
-        
+
         await this.mailerService.addMailJob(
-            user.email, 
-            MailConstants.SubjectMultiFactorAuthMail, 
-            'multi-factor-auth', 
+            user.email,
+            MailConstants.SubjectMultiFactorAuthMail,
+            "multi-factor-auth",
             { code: codeArray },
-            10000
+            10000,
         );
 
         return {
@@ -83,7 +102,8 @@ export class AuthService {
     async register(data: registerData): Promise<ApiResponse<User>> {
         const { email, password, phone, passwordConfirmation, ...rest } = data;
 
-        const existingUserByEmail = !!(await this.usersService.findByEmail(email));
+        const existingUserByEmail =
+            !!(await this.usersService.findByEmail(email));
 
         if (existingUserByEmail) {
             throw new BadRequestException(
@@ -109,7 +129,7 @@ export class AuthService {
         if (newUser) {
             this.sendEmailVerification(newUser);
             const phoneUrl = this.createPhoneSignedUrl(newUser);
-            
+
             return {
                 statusCode: 201,
                 message: "Usuario registrado correctamente.",
@@ -120,25 +140,32 @@ export class AuthService {
     }
 
     async sendEmailVerification(user: User) {
-        const resendUrl = this.customConfigService.appUrl + '/auth/resendEmailVerification/' + user.id;
+        const resendUrl =
+            this.customConfigService.appUrl +
+            "/auth/resendEmailVerification/" +
+            user.id;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
-            { sub: user.id, email: user.email, type: 'email-verification'}
+            { sub: user.id, email: user.email, type: "email-verification" },
         );
 
         await this.mailerService.addMailJob(
-            user.email, 
-            MailConstants.SubjectVerificationMail, 
-            'verify-email', 
+            user.email,
+            MailConstants.SubjectVerificationMail,
+            "verify-email",
             { url: emailUrl, name: user.name, resendUrl: resendUrl },
-            10000
+            10000,
         );
     }
 
     createPhoneSignedUrl(user: User): string {
         const phoneUrl = this.signedUrlService.createSignedUrl(
-            MailConstants.EndpointVerifyPhone, 
-            { sub: user.id, phone: user.phoneNumber, type: 'phone-verification'}
+            MailConstants.EndpointVerifyPhone,
+            {
+                sub: user.id,
+                phone: user.phoneNumber,
+                type: "phone-verification",
+            },
         );
 
         return phoneUrl;
@@ -148,13 +175,18 @@ export class AuthService {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
 
-        const text = TextConstants.TextVerificationCodeMessage + verificationCode;
-        await this.vonageService.addSmsJob(
-            user.phoneNumber, 
-            text,
-            12000
-        );
+        const text =
+            TextConstants.TextVerificationCodeMessage + verificationCode;
+        await this.vonageService.addSmsJob(user.phoneNumber, text, 12000);
         await this.userRepository.save(user);
+    }
+
+    async whitelistToken(token: string): Promise<void> {
+        await this.cacheManager.set(token, "true");
+    }
+
+    async blacklistToken(token: string): Promise<void> {
+        await this.cacheManager.del(token);
     }
 }
 

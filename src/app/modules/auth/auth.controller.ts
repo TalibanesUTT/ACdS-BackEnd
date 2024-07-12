@@ -1,4 +1,13 @@
-import { Request, Body, Controller, Post, UseGuards, Get, Res } from "@nestjs/common";
+import {
+    Request,
+    Body,
+    Controller,
+    Post,
+    UseGuards,
+    Get,
+    Res,
+    Req,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -7,6 +16,7 @@ import { UsersService } from "../users/users.service";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
 import { Response } from "express";
+import { JwtAuthGuard } from "./jwt-auth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -26,7 +36,6 @@ export class AuthController {
             },
         },
     })
-
     async login(@Request() req) {
         const user = req.user;
 
@@ -63,13 +72,20 @@ export class AuthController {
         };
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Post("logout")
+    async logout(@Req() req): Promise<void> {
+        const token = req.headers.authorization.split(" ")[1];
+        await this.authService.blacklistToken(token);
+    }
+
     @Get("resendEmailVerification/:userId")
     async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
         const user = await this.usersService.find(userId);
         await this.authService.sendEmailVerification(user);
 
-        return res.render("new-email-verification")
+        return res.render("new-email-verification");
     }
 
     @Get("resendVerificationCode/:userId")

@@ -6,6 +6,9 @@ services:
     volumes:
       - ./src:/app/src:delegated
       - /app/node_modules
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      
     container_name: acds-nestjs
     environment:
       - DATABASE_HOST=mysql

@@ -1,4 +1,9 @@
-import { ClassSerializerInterceptor, Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
+import {
+    ClassSerializerInterceptor,
+    Module,
+    MiddlewareConsumer,
+    NestModule,
+} from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { CustomConfigModule } from "./config/custom-config.module";
 import { CustomConfigService } from "./config/custom-config.service";
@@ -21,7 +26,7 @@ import { SeederModule } from "./database/seeders/seeder.module";
 import { BullModule } from "@nestjs/bullmq";
 import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
 import { BullBoardService } from "./app/services/bull-board/bull-board.service";
-import { CarBrandsModule } from './app/modules/car-brands/car-brands.module';
+import { CarBrandsModule } from "./app/modules/car-brands/car-brands.module";
 
 @Module({
     imports: [
@@ -38,6 +43,7 @@ import { CarBrandsModule } from './app/modules/car-brands/car-brands.module';
                 return dataSource.options;
             },
         }),
+       
         BullModule.forRootAsync({
             imports: [CustomConfigModule],
             inject: [CustomConfigService],
@@ -48,6 +54,7 @@ import { CarBrandsModule } from './app/modules/car-brands/car-brands.module';
                 },
             }),
         }),
+
         SignedUrlModule,
         MailerModule,
         RandomCodeModule,
@@ -72,6 +79,7 @@ import { CarBrandsModule } from './app/modules/car-brands/car-brands.module';
             provide: APP_GUARD,
             useClass: RolesGuard,
         },
+
     ],
 })
 export class AppModule implements NestModule {
