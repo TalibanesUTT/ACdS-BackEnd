@@ -30,9 +30,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             const user = await this.userRepository.findOneByOrFail({
                 id: payload.sub,
             });
-            const token = ExtractJwt.fromAuthHeaderAsBearerToken()(payload);
+            const token = payload.jti;
             const isWhitelisted = await this.cacheManager.get(token);
-
             if (!isWhitelisted) {
                 return null;
             }

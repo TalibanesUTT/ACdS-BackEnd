@@ -7,11 +7,12 @@ import {
     Get,
     Res,
     Req,
+    Delete,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
-import { ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { UsersService } from "../users/users.service";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
@@ -73,10 +74,11 @@ export class AuthController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post("logout")
+    @ApiBearerAuth()
+    @Delete("logout")
     async logout(@Req() req): Promise<void> {
         const token = req.headers.authorization.split(" ")[1];
-        await this.authService.blacklistToken(token);
+        await this.authService.logout(token);
     }
 
     @Get("resendEmailVerification/:userId")

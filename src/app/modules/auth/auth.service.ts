@@ -4,6 +4,8 @@ import {
     Inject,
     forwardRef,
 } from "@nestjs/common";
+import { v4 as uuidv4 } from "uuid";
+
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/app/entities/user.entity";
 import * as bcrypt from "bcrypt";
@@ -56,10 +58,15 @@ export class AuthService {
     }
 
     async generateToken(user: User) {
-        const payload: JwtPayload = { email: user.email, sub: user.id };
+        const jti = uuidv4();
+        const payload: JwtPayload = {
+            email: user.email,
+            sub: user.id,
+            jti: jti,
+        };
         const token = this.jwtService.sign(payload);
 
-        this.whitelistToken(token);
+        this.whitelistToken(jti);
         return {
             access_token: token,
         };
@@ -97,6 +104,11 @@ export class AuthService {
             data: user,
             url: emailUrl,
         };
+    }
+
+    async logout(token: string): Promise<void> {
+        const payload = this.jwtService.decode(token) as JwtPayload;
+        await this.blacklistToken(payload.jti);
     }
 
     async register(data: registerData): Promise<ApiResponse<User>> {
