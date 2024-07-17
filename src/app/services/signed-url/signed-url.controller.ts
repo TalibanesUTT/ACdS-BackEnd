@@ -40,7 +40,8 @@ export class SignedUrlController {
 
         switch (action) {
             case MailConstants.EndpointVerifyEmail:
-                await this.verifyEmail(user, res);
+                const isNewUser = payload.isNewUser;
+                await this.verifyEmail(user, res, isNewUser);
                 break;
             case MailConstants.EndpointVerifyPhone:
                 await this.verifyPhone(user, code, res);
@@ -56,7 +57,7 @@ export class SignedUrlController {
         }
     }
 
-    async verifyEmail(user: User, @Res() res: Response) {
+    async verifyEmail(user: User, @Res() res: Response, isNewUser: boolean) {
         if (!user.phoneConfirmed) {
             this.authService.sendVerificationCode(user);
         } else {
@@ -66,7 +67,7 @@ export class SignedUrlController {
         user.emailConfirmed = true;
         await this.usersService.save(user);
 
-        const text = TextConstants.TextVerificationSuccessForNewUser;
+        const text = isNewUser ? TextConstants.TextVerificationSuccessForNewUser : TextConstants.TextVerificationSuccessForExistingUser;
         return res.render("success-verification", { text: text });
     }
 

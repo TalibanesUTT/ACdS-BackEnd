@@ -43,12 +43,7 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ email });
-        if (
-            !user ||
-            !user.active ||
-            !user.emailConfirmed ||
-            !user.phoneConfirmed
-        ) {
+        if (!user) {
             return null;
         }
 
@@ -139,7 +134,7 @@ export class AuthService {
         const newUser = await this.userRepository.save(user);
 
         if (newUser) {
-            this.sendEmailVerification(newUser);
+            this.sendEmailVerification(newUser, true);
             const phoneUrl = this.createPhoneSignedUrl(newUser);
 
             return {
@@ -151,21 +146,23 @@ export class AuthService {
         }
     }
 
-    async sendEmailVerification(user: User) {
+    async sendEmailVerification(user: User, isNewUser: boolean = true) {
+        const subject = isNewUser ? MailConstants.SubjectWelcomeMail : MailConstants.SubjectVerificationMail;
         const resendUrl =
             this.customConfigService.appUrl +
             "/auth/resendEmailVerification/" +
+            isNewUser + "/" +
             user.id;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
-            { sub: user.id, email: user.email, type: "email-verification" },
+            { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser },
         );
 
         await this.mailerService.addMailJob(
             user.email,
-            MailConstants.SubjectVerificationMail,
+            subject,
             "verify-email",
-            { url: emailUrl, name: user.name, resendUrl: resendUrl },
+            { url: emailUrl, name: user.name, resendUrl: resendUrl, isNewUser: isNewUser },
             10000,
         );
     }

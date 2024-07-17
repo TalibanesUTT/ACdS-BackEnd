@@ -4,4 +4,5 @@ export interface JwtPayload {
     email?: string;
     phone?: string;
     type?: string;
+    isNewUser?: boolean;
 }

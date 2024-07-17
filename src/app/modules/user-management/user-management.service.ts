@@ -9,6 +9,9 @@ import { SecurePasswordService } from "src/app/services/secure-password/secure-p
 import * as bcrypt from "bcrypt";
 import { MailerService } from "src/app/services/mailer/mailer.service";
 import { MailConstants } from "src/constants/mail-constants";
+import { UsersService } from "../users/users.service";
+import { AuthService } from "../auth/auth.service";
+import { ApiResponse } from "src/app/interfaces/api-response.interface";
 
 @Injectable()
 export class UserManagementService {
@@ -19,6 +22,8 @@ export class UserManagementService {
         private readonly roleRepository: Repository<Role>,
         private readonly securePasswordService: SecurePasswordService,
         private readonly mailerService: MailerService,
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
     ) {}
 
     async getUsers() {
@@ -28,7 +33,7 @@ export class UserManagementService {
         return users;
     }
 
-    async updateUser(id: number, updatedData: UpdateUserDto) {
+    async updateUser(id: number, updatedData: UpdateUserDto): Promise<User> {
         try {
             const user = await this.userRepository.findOneOrFail({
                 where: { id },
@@ -61,6 +66,59 @@ export class UserManagementService {
         }
     }
 
+    async updateProfile(id: number, updatedData: UpdateUserDto): Promise<ApiResponse<User>> {
+            const user = await this.userRepository.findOneBy({ id });
+            var emailHasChanged = false, phoneNumberHasChanged = false;
+            var url = null;
+
+            if (!user) {
+                throw new NotFoundException("Usuario no encontrado");
+            }
+
+            const { email, phoneNumber, role, ...rest } = updatedData;
+
+            if (email && email !== user.email) {
+                const existingUserByEmail = !!(await this.usersService.findByEmail(email));
+
+                if (existingUserByEmail) {
+                    throw new BadRequestException("El correo electrónico ya se encuentra en uso");
+                }
+
+                user.active = false;
+                user.emailConfirmed = false;
+                emailHasChanged = true;
+            }
+
+            if (phoneNumber && phoneNumber !== user.phoneNumber) {
+                user.active = false;
+                user.phoneConfirmed = false;
+                phoneNumberHasChanged = true;
+            }
+
+            const updatedUser = this.userRepository.merge(user, { ...rest, email, phoneNumber });
+            const finalUser = await this.userRepository.save(updatedUser);
+
+            if (emailHasChanged) {
+                this.authService.sendEmailVerification(finalUser, false);
+            }
+
+            if (phoneNumberHasChanged) {
+                url = this.authService.createPhoneSignedUrl(finalUser);
+
+                if (!emailHasChanged) {
+                    this.authService.sendVerificationCode(finalUser);
+                }
+            }
+
+            return {
+                statusCode: 200,
+                message: "Perfil actualizado correctamente",
+                data: finalUser,
+                url: url,
+            };
+
+    }
+
     async recoverPassword(email: string, fromAdmin = false) {
         if (!email) {
             throw new BadRequestException("El correo electrónico es obligatorio");
@@ -69,7 +127,7 @@ export class UserManagementService {
         const user = await this.userRepository.findOneBy({ email });
 
         if (!user || !user.active || !user.emailConfirmed || !user.phoneConfirmed) {
-            throw new NotFoundException("No existe ningún usuario con el correo electrónico proporcionado");
+            throw new NotFoundException("No existe ningún usuario activo con el correo electrónico proporcionado");
         }
 
         const newPassword = this.securePasswordService.generateSecurePassword(10);

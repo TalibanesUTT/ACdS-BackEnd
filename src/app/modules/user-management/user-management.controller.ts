@@ -6,6 +6,8 @@ import { RoleEnum } from "src/app/entities/role.entity";
 import { Roles } from "src/config/roles.decorator";
 import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
 import { SignedUrlGuard } from "src/common/signed.guard";
+import { ApiResponse } from "src/app/interfaces/api-response.interface";
+import { User } from "src/app/entities/user.entity";
 
 @Controller("user-management")
 export class UserManagementController {
@@ -40,19 +42,32 @@ export class UserManagementController {
     @Put(":id")
     @ApiBearerAuth()
     @ApiQuery({ name: "token", type: String, required: true })
+    @HttpCode(200)
     @Roles(RoleEnum.ROOT)
     @UseGuards(SignedUrlGuard)
     async updateUser(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatedData: UpdateUserDto,
-    ) {
+    ): Promise<ApiResponse<User>> {
         // Update user
         const updatedUser = await this.service.updateUser(id, updatedData);
         return {
+            statusCode: 200,
             message: "Usuario actualizado",
-            user: updatedUser,
+            data: updatedUser,
         };
     }
+
+    @Put("updateProfile/:id")
+    //@ApiBearerAuth()
+    @HttpCode(200)
+    async updateProfile(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() updatedData: UpdateUserDto,
+    ) {
+        return await this.service.updateProfile(id, updatedData);
+    }
+
 
     @Post("recoverPassword")
     @HttpCode(200)
@@ -71,6 +86,7 @@ export class UserManagementController {
 
     @Put("updatePassword/:id")
     @HttpCode(200)
+    @ApiBearerAuth()
     @ApiBody({
         schema: {
             type: "object",

@@ -81,11 +81,12 @@ export class AuthController {
         await this.authService.logout(token);
     }
 
-    @Get("resendEmailVerification/:userId")
+    @Get("resendEmailVerification/:isNewUser/:userId")
     async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
+        const isNewUserBool = req.params.isNewUser === "true";
         const user = await this.usersService.find(userId);
-        await this.authService.sendEmailVerification(user);
+        await this.authService.sendEmailVerification(user, isNewUserBool);
 
         return res.render("new-email-verification");
     }

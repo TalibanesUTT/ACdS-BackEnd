@@ -1,5 +1,6 @@
 export class MailConstants {
-    static readonly SubjectVerificationMail = "Bienvenido a Automécanica Centro de Servicio";
+    static readonly SubjectWelcomeMail = "Bienvenido a Automécanica Centro de Servicio";
+    static readonly SubjectVerificationMail = "Verificación de correo electrónico";
     static readonly SubjectMultiFactorAuthMail = "Código de verificación de dos factores";
     static readonly SubjectRecoverPasswordMail = "Recuperación de contraseña";
 
