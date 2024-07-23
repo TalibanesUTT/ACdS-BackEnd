@@ -52,7 +52,7 @@ export class AuthService {
         return isValid ? user : null;
     }
 
-    async generateToken(user: User) {
+    async generateToken(user: User): Promise<ApiResponse<string>> {
         const jti = uuidv4();
         const payload: JwtPayload = {
             email: user.email,
@@ -63,7 +63,9 @@ export class AuthService {
 
         this.whitelistToken(jti);
         return {
-            access_token: token,
+            status: 200,
+            message: "Sesión iniciada correctamente.",
+            data: token,
         };
     }
 
@@ -94,16 +96,22 @@ export class AuthService {
         );
 
         return {
-            statusCode: 200,
-            message: "Código de verificación enviado correctamente.",
+            status: 200,
+            message: "Correo de verificación enviado correctamente.",
             data: user,
             url: emailUrl,
         };
     }
 
-    async logout(token: string): Promise<void> {
+    async logout(token: string): Promise<ApiResponse<string>> {
         const payload = this.jwtService.decode(token) as JwtPayload;
         await this.blacklistToken(payload.jti);
+
+        return {
+            status: 200,
+            message: "Sesión cerrada correctamente.",
+            data: null,
+        };
     }
 
     async register(data: registerData): Promise<ApiResponse<User>> {
@@ -138,7 +146,7 @@ export class AuthService {
             const phoneUrl = this.createPhoneSignedUrl(newUser);
 
             return {
-                statusCode: 201,
+                status: 201,
                 message: "Usuario registrado correctamente.",
                 data: newUser,
                 url: phoneUrl,

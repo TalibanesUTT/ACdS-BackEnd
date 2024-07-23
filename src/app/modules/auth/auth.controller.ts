@@ -8,11 +8,13 @@ import {
     Res,
     Req,
     Delete,
+    HttpCode,
+    BadRequestException
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
-import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "../users/users.service";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
@@ -28,6 +30,7 @@ export class AuthController {
 
     @UseGuards(AuthGuard("local"))
     @Post("login")
+    @HttpCode(200)
     @ApiBody({
         schema: {
             type: "object",
@@ -37,6 +40,7 @@ export class AuthController {
             },
         },
     })
+    @ApiTags("auth")
     async login(@Request() req) {
         const user = req.user;
 
@@ -48,11 +52,14 @@ export class AuthController {
     }
 
     @Post("register")
+    @HttpCode(201)
+    @ApiTags("auth")
     async register(@Body() req: RegisterDto) {
         return this.authService.register(req);
     }
 
     @Post("existsUser")
+    @HttpCode(200)
     @ApiBody({
         schema: {
             type: "object",
@@ -61,27 +68,32 @@ export class AuthController {
             },
         },
     })
-    async existsUser(@Body() req: { email: string }): Promise<object> {
+    @ApiTags("auth")
+    async existsUser(@Body() req: { email: string }): Promise<ApiResponse<boolean>> {
         if (!req.email) {
-            return {
-                exists: false,
-            };
+            throw new BadRequestException("El correo electrónico es requerido");
         }
         const user = !!(await this.usersService.findByEmail(req.email));
         return {
-            exists: user,
+            status: 200,
+            message: null,
+            data: user,
         };
     }
 
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @Delete("logout")
+    @HttpCode(200)
+    @ApiTags("auth")
     async logout(@Req() req): Promise<void> {
         const token = req.headers.authorization.split(" ")[1];
         await this.authService.logout(token);
     }
 
     @Get("resendEmailVerification/:isNewUser/:userId")
+    @HttpCode(200)
+    @ApiTags("auth")
     async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
         const isNewUserBool = req.params.isNewUser === "true";
@@ -92,6 +104,8 @@ export class AuthController {
     }
 
     @Get("resendVerificationCode/:userId")
+    @HttpCode(200)
+    @ApiTags("auth")
     async resendVerificationCode(@Request() req): Promise<ApiResponse<User>> {
         const userId = req.params.userId;
         const user = await this.usersService.find(userId);
@@ -99,7 +113,7 @@ export class AuthController {
         await this.authService.sendVerificationCode(user);
 
         return {
-            statusCode: 200,
+            status: 200,
             message: "Código de verificación reenviado",
             data: user,
             url: phoneUrl,

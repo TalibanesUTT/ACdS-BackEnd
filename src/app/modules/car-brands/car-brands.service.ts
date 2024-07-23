@@ -26,12 +26,11 @@ export class CarBrandsService {
     }
 
     async findOne(id: number): Promise<CarBrand> {
-        console.log("id", id);
         try {
             return await this.repository.findOneByOrFail({ id });
         } catch (error) {
             Logger.error(error);
-            throw new NotFoundException(`Auto no encontrado`);
+            throw new NotFoundException(`Marca de auto no encontrada`);
         }
     }
 

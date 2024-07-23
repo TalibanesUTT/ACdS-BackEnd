@@ -111,7 +111,7 @@ export class UserManagementService {
             }
 
             return {
-                statusCode: 200,
+                status: 200,
                 message: "Perfil actualizado correctamente",
                 data: finalUser,
                 url: url,
@@ -119,7 +119,7 @@ export class UserManagementService {
 
     }
 
-    async recoverPassword(email: string, fromAdmin = false) {
+    async recoverPassword(email: string, fromAdmin = false): Promise<ApiResponse<string>> {
         if (!email) {
             throw new BadRequestException("El correo electrónico es obligatorio");
         }
@@ -143,12 +143,13 @@ export class UserManagementService {
         );
 
         return {
-            statusCode: 200,
-            message: "Correo de recuperación de contraseña enviado correctamente"
+            status: 200,
+            message: "Correo de recuperación de contraseña enviado correctamente",
+            data: null
         };
     }
 
-    async updatePassword(id: number, actualPassword: string, newPassword: string, passwordConfirmation: string) {
+    async updatePassword(id: number, actualPassword: string, newPassword: string, passwordConfirmation: string): Promise<ApiResponse<string>> {
         if (newPassword !== passwordConfirmation) {
             throw new BadRequestException("Las contraseñas no coinciden");
         }
@@ -165,8 +166,9 @@ export class UserManagementService {
         await this.userRepository.save(user);
 
         return {
-            statusCode: 200,
-            message: "Contraseña actualizada correctamente"
+            status: 200,
+            message: "Contraseña actualizada correctamente",
+            data: null,
         };
     }
 }

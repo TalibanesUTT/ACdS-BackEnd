@@ -8,6 +8,7 @@ import * as bcrypt from "bcrypt";
 import { Response } from "express";
 import { AuthService } from "src/app/modules/auth/auth.service";
 import { TextConstants } from "src/constants/text-constants";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("signed-url")
 export class SignedUrlController {
@@ -19,6 +20,7 @@ export class SignedUrlController {
     ) {}
 
     @Get("verify/:action")
+    @ApiTags("signed-url")
     async verifySignedUrl(
         @Req() request: Request,
         @Query("token") token: string,
@@ -92,7 +94,11 @@ export class SignedUrlController {
 
         await this.usersService.save(user);
 
-        return res.json({ message: "Teléfono verificado correctamente" });
+        return res.json({ 
+            status: 200,
+            message: "Teléfono verificado correctamente" ,
+            data: null
+        });
     }
 
     async multiFactorAuth(user: User, code: string, @Res() res: Response) {
@@ -111,11 +117,5 @@ export class SignedUrlController {
         user.verificationCode = null;
         await this.usersService.save(user);
         const token = await this.authService.generateToken(user);
-
-        return res.json({ 
-            message: "Autenticación de dos factores exitosa",
-            token: token.access_token,
-         });
-        
     }
 }

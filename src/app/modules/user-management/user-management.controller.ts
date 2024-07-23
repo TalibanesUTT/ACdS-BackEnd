@@ -4,7 +4,7 @@ import { UserManagementService } from "./user-management.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { Roles } from "src/config/roles.decorator";
-import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { SignedUrlGuard } from "src/common/signed.guard";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
@@ -19,7 +19,9 @@ export class UserManagementController {
     @Get("users")
     @ApiBearerAuth()
     @Roles(RoleEnum.ROOT)
-    async getUsers() {
+    @HttpCode(200)
+    @ApiTags("user-management")
+    async getUsers(): Promise<ApiResponse<object[]>> {
         // Retrieve all users
         const users = await this.service.getUsers();
 
@@ -36,7 +38,11 @@ export class UserManagementController {
             })),
         );
 
-        return usersWithSignedUrls;
+        return {
+            status: 200,
+            message: null,
+            data: usersWithSignedUrls,
+        };
     }
 
     @Put(":id")
@@ -45,6 +51,7 @@ export class UserManagementController {
     @HttpCode(200)
     @Roles(RoleEnum.ROOT)
     @UseGuards(SignedUrlGuard)
+    @ApiTags("user-management")
     async updateUser(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatedData: UpdateUserDto,
@@ -52,22 +59,23 @@ export class UserManagementController {
         // Update user
         const updatedUser = await this.service.updateUser(id, updatedData);
         return {
-            statusCode: 200,
-            message: "Usuario actualizado",
+            status: 200,
+            message: "Usuario actualizado correctamente",
             data: updatedUser,
         };
     }
 
     @Put("updateProfile/:id")
-    //@ApiBearerAuth()
+    @ApiBearerAuth()
+    @ApiQuery({ name: "token", type: String, required: true })
     @HttpCode(200)
+    @ApiTags("user-management")
     async updateProfile(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatedData: UpdateUserDto,
     ) {
         return await this.service.updateProfile(id, updatedData);
     }
-
 
     @Post("recoverPassword")
     @HttpCode(200)
@@ -80,6 +88,7 @@ export class UserManagementController {
             },
         },
     })
+    @ApiTags("user-management")
     async recoverPassword(@Body() req: { email: string, fromAdmin: boolean}) {
         return this.service.recoverPassword(req.email, req.fromAdmin);
     }
@@ -97,6 +106,7 @@ export class UserManagementController {
             },
         },
     })
+    @ApiTags("user-management")
     async updatePassword(
         @Param("id", ParseIntPipe) id: number,
         @Body() req: { actualPassword: string, newPassword: string, passwordConfirmation: string },
