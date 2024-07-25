@@ -116,6 +116,8 @@ export class SignedUrlController {
 
         user.verificationCode = null;
         await this.usersService.save(user);
-        const token = await this.authService.generateToken(user);
+        const response = await this.authService.generateToken(user);
+
+        return res.status(response.status).json(response);
     }
 }
