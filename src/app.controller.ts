@@ -11,10 +11,6 @@ import { User } from "./app/entities/user.entity";
 export class AppController {
     constructor(private readonly appService: AppService) {}
     @Get("profile")
-    /*    @ApiHeader({
-        name: "Authorization",
-        description: "Bearer <access_token>",
-    }) */
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     getProfile(@GetUser() user: User) {

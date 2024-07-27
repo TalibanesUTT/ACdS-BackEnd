@@ -22,6 +22,7 @@ import { Response } from "express";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 
 @Controller("auth")
+@ApiTags("auth")
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
@@ -40,7 +41,6 @@ export class AuthController {
             },
         },
     })
-    @ApiTags("auth")
     async login(@Request() req) {
         const user = req.user;
 
@@ -53,7 +53,6 @@ export class AuthController {
 
     @Post("register")
     @HttpCode(201)
-    @ApiTags("auth")
     async register(@Body() req: RegisterDto) {
         return this.authService.register(req);
     }
@@ -68,7 +67,6 @@ export class AuthController {
             },
         },
     })
-    @ApiTags("auth")
     async existsUser(@Body() req: { email: string }): Promise<ApiResponse<boolean>> {
         if (!req.email) {
             throw new BadRequestException("El correo electrónico es requerido");
@@ -85,15 +83,13 @@ export class AuthController {
     @ApiBearerAuth()
     @Delete("logout")
     @HttpCode(200)
-    @ApiTags("auth")
-    async logout(@Req() req): Promise<void> {
+    async logout(@Req() req): Promise<ApiResponse<string>> {
         const token = req.headers.authorization.split(" ")[1];
-        await this.authService.logout(token);
+        return await this.authService.logout(token);
     }
 
     @Get("resendEmailVerification/:isNewUser/:userId")
     @HttpCode(200)
-    @ApiTags("auth")
     async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
         const isNewUserBool = req.params.isNewUser === "true";
@@ -105,7 +101,6 @@ export class AuthController {
 
     @Get("resendVerificationCode/:userId")
     @HttpCode(200)
-    @ApiTags("auth")
     async resendVerificationCode(@Request() req): Promise<ApiResponse<User>> {
         const userId = req.params.userId;
         const user = await this.usersService.find(userId);

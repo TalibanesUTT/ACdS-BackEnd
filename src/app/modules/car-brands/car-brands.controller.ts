@@ -8,6 +8,7 @@ import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
 
 @Controller("car-brands")
+@ApiTags("car-brands")
 export class CarBrandsController {
     constructor(
         private readonly carBrandsService: CarBrandsService,
@@ -15,7 +16,6 @@ export class CarBrandsController {
 
     @Get()
     @HttpCode(200)
-    @ApiTags("car-brands")
     @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
     async getCarBrands(): Promise<ApiResponse<CarBrand[]>> {
         const brands = await this.carBrandsService.findAll();
@@ -33,7 +33,6 @@ export class CarBrandsController {
         type: "number",
         description: "The id of the car brand",
     })
-    @ApiTags("car-brands")
     async getCarBrand(@Param() id: number): Promise<ApiResponse<CarBrand>> {
         const brand = await this.carBrandsService.findOne(id);
         return {
@@ -45,7 +44,6 @@ export class CarBrandsController {
 
     @Post()
     @HttpCode(201)
-    @ApiTags("car-brands")
     @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
     async createCarBrand(@Body() createCarBrandDto: CreateCarBrandDto): Promise<ApiResponse<CarBrand>> {
         const name = createCarBrandDto.name;
@@ -60,7 +58,6 @@ export class CarBrandsController {
 
     @Put(":id")
     @HttpCode(200)
-    @ApiTags("car-brands")
     @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
     async updateCarBrand(
         @Body() dto: UpdateCarBrandDto,

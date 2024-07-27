@@ -66,8 +66,7 @@ export class UserManagementService {
         }
     }
 
-    async updateProfile(id: number, updatedData: UpdateUserDto): Promise<ApiResponse<User>> {
-            const user = await this.userRepository.findOneBy({ id });
+    async updateProfile(user: User, updatedData: UpdateUserDto): Promise<ApiResponse<User>> {
             var emailHasChanged = false, phoneNumberHasChanged = false;
             var url = null;
 
@@ -149,12 +148,10 @@ export class UserManagementService {
         };
     }
 
-    async updatePassword(id: number, actualPassword: string, newPassword: string, passwordConfirmation: string): Promise<ApiResponse<string>> {
+    async updatePassword(user: User, actualPassword: string, newPassword: string, passwordConfirmation: string): Promise<ApiResponse<string>> {
         if (newPassword !== passwordConfirmation) {
             throw new BadRequestException("Las contraseñas no coinciden");
         }
-
-        const user = await this.userRepository.findOneBy({ id });
 
         const isPasswordValid = await bcrypt.compare(actualPassword, user.password);
 
