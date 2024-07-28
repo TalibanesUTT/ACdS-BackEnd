@@ -37,21 +37,40 @@
                                 {{name}}!
                         </h1>
                         <p>
-                            {{#if isNewUser}}
-                                Muchas gracias por registrarte en nuestra
-                                aplicación. A continuación, es necesario verificar y
-                                activar tu cuenta para que puedas continuar
-                                utilizándola. Por favor, da clic en el siguiente
-                                botón para verificar tu correo electrónico, y en
-                                breve, recibirás un mensaje de texto a tu teléfono
-                                celular proporcionado, con el código de verificación
-                                que necesitas para activar tu cuenta. Por favor,
-                                envíalo desde la aplicación en cuanto lo recibas.
+                            {{#if fromAdmin}}
+                                {{#if isNewUser}}
+                                    Enviamos este correo electrónico para informarte que un
+                                    administrador te ha dado de alta en nuestro sistema, 
+                                    Automécanica Centro de Servicio. A partir de ahora, podrás 
+                                    ingresar a nuestra <a href="https://appdevweb.online/home">
+                                    aplicación</a> con esta dirección de correo electrónico y 
+                                    la siguiente contraseña temporal: <strong>{{password}}</strong>.
+                                    No olvides cambiarla en cuanto ingreses. Además, es necesario
+                                    verificar tu dirección de correo, por lo que te pedimos que
+                                    des clic en el siguiente botón para hacerlo.
+                                {{else}}
+                                    Un administrador de nuestro sistema ha actualizado tu
+                                    correo electrónico con tu nueva dirección. Por favor, da
+                                    clic en el siguiente botón para verificarlo y poder
+                                    continuar utilizando tu cuenta con normalidad.
+                                {{/if}}
                             {{else}}
-                                Hemos recibido tu solicitud para cambiar tu correo
-                                electrónico. Por favor, da clic en el siguiente botón
-                                para verificar tu nuevo correo electrónico y poder 
-                                continuar utilizando tu cuenta con normalidad.
+                                {{#if isNewUser}}
+                                    Muchas gracias por registrarte en nuestra
+                                    aplicación. A continuación, es necesario verificar y
+                                    activar tu cuenta para que puedas continuar
+                                    utilizándola. Por favor, da clic en el siguiente
+                                    botón para verificar tu correo electrónico, y en
+                                    breve, recibirás un mensaje de texto a tu teléfono
+                                    celular proporcionado, con el código de verificación
+                                    que necesitas para activar tu cuenta. Por favor,
+                                    envíalo desde la aplicación en cuanto lo recibas.
+                                {{else}}
+                                    Hemos recibido tu solicitud para cambiar tu correo
+                                    electrónico. Por favor, da clic en el siguiente botón
+                                    para verificar tu nuevo correo electrónico y poder 
+                                    continuar utilizando tu cuenta con normalidad.
+                                {{/if}}
                             {{/if}}
                         </p>
                     </td>

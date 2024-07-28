@@ -50,6 +50,10 @@ export class User {
     active: boolean;
 
     @Exclude()
+    @Column({ type: "boolean", default: false, name: "changed_by_admin" })
+    changedByAdmin: boolean;
+
+    @Exclude()
     @Column({
         type: "timestamp",
         name: "create_date",

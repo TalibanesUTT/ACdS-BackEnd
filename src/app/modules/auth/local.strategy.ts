@@ -25,12 +25,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
                 "Tu correo electrónico no ha sido confirmado",
             );
         }
-
-        if (!user.phoneConfirmed) {
-            throw new UnauthorizedException(
-                "Tu número de teléfono no ha sido confirmado",
-            );
-        }
         return user;
     }
 }

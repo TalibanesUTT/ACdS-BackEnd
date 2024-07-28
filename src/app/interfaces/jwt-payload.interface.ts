@@ -5,4 +5,5 @@ export interface JwtPayload {
     phone?: string;
     type?: string;
     isNewUser?: boolean;
+    fromAdmin?: boolean;
 }

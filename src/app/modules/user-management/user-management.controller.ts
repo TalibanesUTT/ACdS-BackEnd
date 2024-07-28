@@ -65,10 +65,11 @@ export class UserManagementController {
     @HttpCode(200)
     @UseGuards(JwtAuthGuard)
     async updateProfile(
+        @Param("id", ParseIntPipe) id: number,
         @GetUser() user: User,
         @Body() updatedData: UpdateUserDto,
     ) {
-        return this.service.updateProfile(user, updatedData);
+        return this.service.updateProfile(user, id, updatedData);
     }
 
     @Post("recoverPassword")

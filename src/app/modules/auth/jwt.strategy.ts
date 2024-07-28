@@ -36,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 return null;
             }
 
-            if (!user.active || !user.emailConfirmed || !user.phoneConfirmed) {
+            if (!user.active || !user.emailConfirmed) {
                 return null;
             }
             return user;

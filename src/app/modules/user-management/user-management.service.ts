@@ -66,15 +66,20 @@ export class UserManagementService {
         }
     }
 
-    async updateProfile(user: User, updatedData: UpdateUserDto): Promise<ApiResponse<User>> {
-            var emailHasChanged = false, phoneNumberHasChanged = false;
+    async updateProfile(user: User, id: number, updatedData: UpdateUserDto): Promise<ApiResponse<User>> {
+            var emailHasChanged = false, phoneNumberHasChanged = false, isNewUser = false;
             var url = null;
 
             if (!user) {
-                throw new NotFoundException("Usuario no encontrado");
+                user = await this.userRepository.findOneBy({ id });
+                isNewUser = true;
+
+                if (!user) {
+                    throw new NotFoundException("Usuario no encontrado");
+                }
             }
 
-            const { email, phoneNumber, role, ...rest } = updatedData;
+            const { email, phoneNumber, role, password, ...rest } = updatedData;
 
             if (email && email !== user.email) {
                 const existingUserByEmail = !!(await this.usersService.findByEmail(email));
@@ -94,11 +99,15 @@ export class UserManagementService {
                 phoneNumberHasChanged = true;
             }
 
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
+
             const updatedUser = this.userRepository.merge(user, { ...rest, email, phoneNumber });
             const finalUser = await this.userRepository.save(updatedUser);
 
             if (emailHasChanged) {
-                this.authService.sendEmailVerification(finalUser, false);
+                this.authService.sendEmailVerification(finalUser, isNewUser, false);
             }
 
             if (phoneNumberHasChanged) {

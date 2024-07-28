@@ -20,12 +20,13 @@ import { CacheModule } from "@nestjs/cache-manager";
 import type { RedisClientOptions } from "redis";
 import { redisStore } from "cache-manager-redis-store";
 import { RedisStoreProxy } from "src/config/redis-store-proxy";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
     imports: [
         UsersModule,
         ConfigModule.forRoot({ isGlobal: true }),
-
+        HttpModule,
         PassportModule,
         CustomConfigModule,
         CacheModule.registerAsync<RedisClientOptions>({

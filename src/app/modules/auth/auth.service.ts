@@ -76,6 +76,10 @@ export class AuthService {
         );
     }
 
+    requirePhoneVerification(user: User): boolean {
+        return user.role.value === RoleEnum.CUSTOMER && !user.phoneConfirmed && user.changedByAdmin;
+    }
+
     async sendMultiFactorAuthEmail(user: User): Promise<ApiResponse<User>> {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
@@ -142,7 +146,7 @@ export class AuthService {
         const newUser = await this.userRepository.save(user);
 
         if (newUser) {
-            this.sendEmailVerification(newUser, true);
+            this.sendEmailVerification(newUser, true, false);
             const phoneUrl = this.createPhoneSignedUrl(newUser);
 
             return {
@@ -154,23 +158,24 @@ export class AuthService {
         }
     }
 
-    async sendEmailVerification(user: User, isNewUser: boolean = true) {
+    async sendEmailVerification(user: User, isNewUser: boolean = true, fromAdmin: boolean = false, password?: string) {
+        password = password || 'no';
         const subject = isNewUser ? MailConstants.SubjectWelcomeMail : MailConstants.SubjectVerificationMail;
         const resendUrl =
             this.customConfigService.appUrl +
             "/auth/resendEmailVerification/" +
-            isNewUser + "/" +
+            isNewUser + "/" + fromAdmin + "/" + password + "/" +
             user.id;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
-            { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser },
+            { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser, fromAdmin: fromAdmin },
         );
 
         await this.mailerService.addMailJob(
             user.email,
             subject,
             "verify-email",
-            { url: emailUrl, name: user.name, resendUrl: resendUrl, isNewUser: isNewUser },
+            { url: emailUrl, name: user.name, resendUrl: resendUrl, isNewUser: isNewUser, fromAdmin: fromAdmin, password: password },
             10000,
         );
     }

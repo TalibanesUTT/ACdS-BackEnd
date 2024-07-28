@@ -85,6 +85,12 @@ export class CreateUsersTable1718333607741 implements MigrationInterface {
                         default: 0,
                     }),
                     new TableColumn({
+                        name: "changed_by_admin",
+                        type: "boolean",
+                        isNullable: false,
+                        default: 0,
+                    }),
+                    new TableColumn({
                         name: "create_date",
                         type: "timestamp",
                         isNullable: false,

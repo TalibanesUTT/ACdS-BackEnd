@@ -20,6 +20,9 @@ import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { User } from "src/app/entities/user.entity";
 import { Response } from "express";
 import { JwtAuthGuard } from "./jwt-auth.guard";
+import { HttpService } from "@nestjs/axios";
+import { CustomConfigService } from "src/config/custom-config.service";
+import { firstValueFrom } from "rxjs";
 
 @Controller("auth")
 @ApiTags("auth")
@@ -27,6 +30,8 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly usersService: UsersService,
+        private readonly httpService: HttpService,
+        private readonly customConfigService: CustomConfigService
     ) {}
 
     @UseGuards(AuthGuard("local"))
@@ -46,6 +51,10 @@ export class AuthController {
 
         if (this.authService.requireMultiFactorAuth(user)) {
             return await this.authService.sendMultiFactorAuthEmail(user);
+        } else if (this.authService.requirePhoneVerification(user)) {
+            const appUrl = this.customConfigService.appUrl;
+            const response = await firstValueFrom(this.httpService.get(`${appUrl}/auth/resendVerificationCode/${user.id}`))
+            return response.data;
         } else {
             return this.authService.generateToken(user);
         }
@@ -88,13 +97,15 @@ export class AuthController {
         return await this.authService.logout(token);
     }
 
-    @Get("resendEmailVerification/:isNewUser/:userId")
+    @Get("resendEmailVerification/:isNewUser/:fromAdmin/:password/:userId")
     @HttpCode(200)
     async resendEmailVerification(@Request() req, @Res() res: Response) {
         const userId = req.params.userId;
         const isNewUserBool = req.params.isNewUser === "true";
+        const fromAdminBool = req.params.fromAdmin === "true";
+        const password = req.params.password === "no" ? null : req.params.password;
         const user = await this.usersService.find(userId);
-        await this.authService.sendEmailVerification(user, isNewUserBool);
+        await this.authService.sendEmailVerification(user, isNewUserBool, fromAdminBool, password);
 
         return res.render("new-email-verification");
     }
