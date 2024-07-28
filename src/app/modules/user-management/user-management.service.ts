@@ -3,7 +3,7 @@ import { User } from "src/app/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { plainToClass } from "class-transformer";
-import { Role } from "src/app/entities/role.entity";
+import { Role, RoleEnum } from "src/app/entities/role.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { SecurePasswordService } from "src/app/services/secure-password/secure-password.service";
 import * as bcrypt from "bcrypt";
@@ -12,6 +12,7 @@ import { MailConstants } from "src/constants/mail-constants";
 import { UsersService } from "../users/users.service";
 import { AuthService } from "../auth/auth.service";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
+import { TextConstants } from "src/constants/text-constants";
 
 @Injectable()
 export class UserManagementService {
@@ -49,6 +50,13 @@ export class UserManagementService {
                 role,
             };
 
+            if (updatedData.active !== user.active) {
+                this.sendStatusNotification(user, updatedData.active);
+            }
+
+            if (role && role.value !== user.role.value) {
+                this.sendRoleNotification(user, role);
+            }
             // Merge the updated data
             const updatedUser = this.userRepository.merge(user, formattedUser);
 
@@ -61,7 +69,7 @@ export class UserManagementService {
             if (error.name === "EntityNotFoundError") {
                 throw new NotFoundException("Usuario no encontrado");
             } else {
-                throw new BadRequestException("Datos invalidos");
+                throw new BadRequestException("Datos inválidos");
             }
         }
     }
@@ -176,5 +184,49 @@ export class UserManagementService {
             message: "Contraseña actualizada correctamente",
             data: null,
         };
+    }
+
+    private async sendStatusNotification(user: User, status: boolean) {
+        const subject = status ? MailConstants.SubjectAccountActivatedMail : MailConstants.SubjectAccountDeactivatedMail;
+        const text = status ? TextConstants.TextAccountActivated : TextConstants.TextAccountDeactivated;
+
+        await this.mailerService.addMailJob(
+            user.email,
+            subject,
+            "status-notification",
+            { name: user.name, text: text },
+            10000,
+        );
+    }
+
+    private async sendRoleNotification(user: User, role: Role) {
+        const subject = MailConstants.SubjectRoleChangedMail;
+        var roleText = "";
+
+        switch (role.value) {
+            case RoleEnum.ADMIN:
+                roleText = "administrativo";
+                break;
+            case RoleEnum.CUSTOMER:
+                roleText = "cliente";
+                break;
+            case RoleEnum.ROOT:
+                roleText = "administrador";
+                break;
+            case RoleEnum.MECHANIC:
+                roleText = "mecánico";
+                break;
+            default:
+                roleText = "cliente";
+                break;
+        }
+
+        await this.mailerService.addMailJob(
+            user.email,
+            subject,
+            "role-notification",
+            { name: user.name, role: roleText },
+            10000,
+        );
     }
 }
