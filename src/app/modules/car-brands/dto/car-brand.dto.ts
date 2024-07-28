@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 export class CreateCarBrandDto {
     @ApiProperty({
@@ -8,6 +8,7 @@ export class CreateCarBrandDto {
     })
     @IsString()
     @IsNotEmpty()
+    @MaxLength(70, { message: "El nombre de la marca puede contener un máximo de 70 caracteres" })
     name: string;
 }
 
@@ -18,5 +19,6 @@ export class UpdateCarBrandDto {
         description: "The name of the car brand",
         example: "Toyota",
     })
+    @MaxLength(70, { message: "El nombre de la marca puede contener un máximo de 70 caracteres" })
     name: string;
 }

@@ -28,6 +28,8 @@ import { BullBoardModule } from "./app/services/bull-board/bull-board.module";
 import { BullBoardService } from "./app/services/bull-board/bull-board.service";
 import { CarBrandsModule } from "./app/modules/car-brands/car-brands.module";
 import { CustomersModule } from "./app/modules/customers/customers.module";
+import { VehiclesModule } from "./app/modules/vehicles/vehicles.module";
+import { CarModelsModule } from "./app/modules/car-models/car-models.module";
 
 @Module({
     imports: [
@@ -67,6 +69,8 @@ import { CustomersModule } from "./app/modules/customers/customers.module";
         BullBoardModule,
         CarBrandsModule,
         CustomersModule,
+        VehiclesModule,
+        CarModelsModule,
     ],
     controllers: [AppController],
     providers: [

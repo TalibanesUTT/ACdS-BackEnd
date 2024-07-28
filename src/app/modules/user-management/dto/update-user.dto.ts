@@ -5,6 +5,8 @@ import {
     IsEmail,
     IsBoolean,
     IsEnum,
+    MaxLength,
+    MinLength,
 } from "class-validator";
 import { RoleEnum } from "src/app/entities/role.entity";
 
@@ -15,6 +17,9 @@ export class UpdateUserDto {
     })
     @IsOptional()
     @IsString()
+    @MaxLength(60, {
+        message: "El nombre puede contener un máximo de 60 caracteres",
+    })
     name?: string;
 
     @ApiPropertyOptional({
@@ -23,6 +28,9 @@ export class UpdateUserDto {
     })
     @IsOptional()
     @IsString()
+    @MaxLength(60, {
+        message: "El apellido puede contener un máximo de 60 caracteres",
+    })
     lastName?: string;
 
     @ApiPropertyOptional({
@@ -31,6 +39,10 @@ export class UpdateUserDto {
     })
     @IsOptional()
     @IsEmail()
+    @MaxLength(100, {
+        message:
+            "El correo electrónico puede contener un máximo de 100 caracteres",
+    })
     email?: string;
 
     @ApiPropertyOptional({
@@ -39,6 +51,10 @@ export class UpdateUserDto {
     })
     @IsOptional()
     @IsString()
+    @MaxLength(10, {
+        message:
+            "El número de teléfono puede contener un máximo de 10 caracteres",
+    })
     phoneNumber?: string;
 
     @ApiPropertyOptional({
@@ -47,6 +63,12 @@ export class UpdateUserDto {
     })
     @IsOptional()
     @IsString()
+    @MinLength(8, {
+        message: "La contraseña debe contener al menos 8 caracteres",
+    })
+    @MaxLength(30, {
+        message: "La contraseña puede contener un máximo de 30 caracteres",
+    })
     password?: string;
 
     @ApiPropertyOptional({ description: "Is the user active?", example: true })
