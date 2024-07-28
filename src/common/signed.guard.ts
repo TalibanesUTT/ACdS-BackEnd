@@ -3,6 +3,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     Injectable,
+    Logger,
     UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -27,8 +28,8 @@ export class SignedUrlGuard implements CanActivate {
 
             // Extract resource ID from URL
             const urlParts = request.url.split("/");
-            const resourceId = urlParts[urlParts.length - 1][0];
-            console.log("sub", sub);
+            const lastPart = urlParts[urlParts.length - 1];
+            const resourceId = lastPart.split("?")[0];
 
             if (sub != resourceId) {
                 throw new UnauthorizedException(
@@ -42,7 +43,8 @@ export class SignedUrlGuard implements CanActivate {
             }
 
             return true;
-        } catch {
+        } catch (error) {
+            Logger.error(error);
             return false;
         }
     }

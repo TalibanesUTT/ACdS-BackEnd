@@ -5,11 +5,13 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Role } from "./role.entity";
 import { Exclude, Transform } from "class-transformer";
+import { Vehicle } from "./vehicle.entity";
 
 @Entity({
     name: "Users",
@@ -40,16 +42,18 @@ export class User {
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
 
-    @Exclude()
     @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
-    @Exclude()
     @Column({ type: "boolean", default: false, name: "phone_confirmed" })
     phoneConfirmed: boolean;
 
     @Column({ type: "boolean", default: false })
     active: boolean;
+
+    @Exclude()
+    @Column({ type: "boolean", default: false, name: "changed_by_admin" })
+    changedByAdmin: boolean;
 
     @Exclude()
     @Column({
@@ -65,6 +69,9 @@ export class User {
     @JoinColumn({ name: "role_id" })
     @Transform(({ value }) => value.value)
     role: Role;
+
+    @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
+    vehicles: Vehicle[];
 
     async comparePassword(attempt: string): Promise<boolean> {
         return await bcrypt.compare(attempt, this.password);

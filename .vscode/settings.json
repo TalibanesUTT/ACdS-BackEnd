@@ -1,6 +1,8 @@
 {
     "conventionalCommits.scopes": [
         "auth",
-        "deploy"
+        "deploy",
+        "user-management",
+        "vehicles"
     ]
 }

@@ -1,0 +1,47 @@
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nuevo correo enviado</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; } .container {
+            width: 100%; height: 100vh; /*Grid de dos en vertical*/ display:
+            grid; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr;
+            justify-content: center; align-items: center; } .column1 { display:
+            flex; flex-direction: column; justify-content: center; align-items:
+            center; background-color: #f2494e; width: 100%; height: 100%;
+            text-align: center; gap: 20px; } .column2 { display: flex;
+            flex-direction: column; justify-content: space-between; align-items:
+            center; width: 100%; height: 100%; padding-top: 20px;
+            padding-bottom: 20px; } h1 { color: white; font-size: 48px;
+            font-family: Arial, sans-serif; } p { color: white; font-size: 24px;
+            width: 60%; font-family: Arial, sans-serif; } button {
+            background-color: white; width: 270px; height: 70px; border-radius:
+            100px; color: white; font-size: 18px; border: none; } button:hover {
+            background-color: white; cursor: pointer; } footer { display: flex;
+            flex-direction: column; justify-content: center; align-items:
+            center; text-align: center; gap: 10px; margin-bottom: 20px; width:
+            100%; } @media screen and (max-width: 768px) { h1 { color: white;
+            font-size: 28px; font-family: Arial, sans-serif; } p { color: white;
+            font-size: 16px; width: 90%; font-family: Arial, sans-serif; }
+            button { background-color: white; width: 200px; height: 50px;
+            border-radius: 100px; color: white; font-size: 14px; border: none; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="column1">
+                <h1>Se te ha enviado un nuevo correo electrónico.</h1>
+                <p>Por favor, verifica tu correo electrónico con el nuevo enlace de verificación que se te ha generado.</p>
+            </div>
+            <div class="column2">
+                <footer>
+                    <p style="color: black; font-size: medium">
+                        @ACdS Integration 2024. Todos los derechos reservados.
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,41 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, MinLength, IsEmail, MaxLength } from "class-validator";
+
+export class CustomerDto {
+    @ApiProperty({ description: "Los nombres del cliente", example: "Juan" })
+    @IsNotEmpty({ message: "El nombre es obligatorio" })
+    @MaxLength(60, {
+        message: "El nombre puede contener un máximo de 60 caracteres",
+    })
+    name: string;
+
+    @ApiProperty({ description: "Los apellidos del usuario", example: "Pérez" })
+    @IsNotEmpty({ message: "El apellido es obligatorio" })
+    @MaxLength(60, {
+        message: "El apellido puede contener un máximo de 60 caracteres",
+    })
+    lastName: string;
+
+    @ApiProperty({
+        description: "La dirección de correo electrónico del usuario",
+        example: "juan.perez@example.com",
+    })
+    @IsNotEmpty({ message: "El correo electrónico es obligatorio" })
+    @IsEmail({}, { message: "El correo electrónico no es válido" })
+    @MaxLength(100, {
+        message:
+            "El correo electrónico puede contener un máximo de 100 caracteres",
+    })
+    email: string;
+
+    @ApiProperty({
+        description: "El número de teléfono del usuario",
+        example: "1234567890",
+    })
+    @IsNotEmpty({ message: "El número de teléfono es obligatorio" })
+    @MaxLength(10, {
+        message:
+            "El número de teléfono puede contener un máximo de 10 caracteres",
+    })
+    phoneNumber: string;
+}

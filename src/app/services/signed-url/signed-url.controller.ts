@@ -8,6 +8,7 @@ import * as bcrypt from "bcrypt";
 import { Response } from "express";
 import { AuthService } from "src/app/modules/auth/auth.service";
 import { TextConstants } from "src/constants/text-constants";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("signed-url")
 export class SignedUrlController {
@@ -19,6 +20,7 @@ export class SignedUrlController {
     ) {}
 
     @Get("verify/:action")
+    @ApiTags("signed-url")
     async verifySignedUrl(
         @Req() request: Request,
         @Query("token") token: string,
@@ -40,7 +42,9 @@ export class SignedUrlController {
 
         switch (action) {
             case MailConstants.EndpointVerifyEmail:
-                await this.verifyEmail(user, res);
+                const isNewUser = payload.isNewUser;
+                const fromAdmin = payload.fromAdmin;
+                await this.verifyEmail(user, res, isNewUser, fromAdmin);
                 break;
             case MailConstants.EndpointVerifyPhone:
                 await this.verifyPhone(user, code, res);
@@ -56,8 +60,8 @@ export class SignedUrlController {
         }
     }
 
-    async verifyEmail(user: User, @Res() res: Response) {
-        if (!user.phoneConfirmed) {
+    async verifyEmail(user: User, @Res() res: Response, isNewUser: boolean, fromAdmin: boolean = false) {
+        if (!fromAdmin && !user.phoneConfirmed) {
             this.authService.sendVerificationCode(user);
         } else {
             user.active = true;
@@ -66,7 +70,13 @@ export class SignedUrlController {
         user.emailConfirmed = true;
         await this.usersService.save(user);
 
-        const text = TextConstants.TextVerificationSuccessForNewUser;
+        var text = "";
+
+        if (fromAdmin) {
+            text = TextConstants.TextVerificationSuccessFromAdmin;
+        } else {
+            text = isNewUser ? TextConstants.TextVerificationSuccessForNewUser : TextConstants.TextVerificationSuccessForExistingUser;
+        }
         return res.render("success-verification", { text: text });
     }
 
@@ -88,10 +98,17 @@ export class SignedUrlController {
         if (user.emailConfirmed) {
             user.active = true;
         }
+        if (user.changedByAdmin) {
+            user.changedByAdmin = false;
+        }
 
         await this.usersService.save(user);
 
-        return res.json({ message: "Teléfono verificado correctamente" });
+        return res.json({ 
+            status: 200,
+            message: "Teléfono verificado correctamente" ,
+            data: null
+        });
     }
 
     async multiFactorAuth(user: User, code: string, @Res() res: Response) {
@@ -109,12 +126,8 @@ export class SignedUrlController {
 
         user.verificationCode = null;
         await this.usersService.save(user);
-        const token = await this.authService.generateToken(user);
+        const response = await this.authService.generateToken(user);
 
-        return res.json({ 
-            message: "Autenticación de dos factores exitosa",
-            token: token.access_token,
-         });
-        
+        return res.status(response.status).json(response);
     }
 }

@@ -18,6 +18,7 @@ export class RolesGuard implements CanActivate {
             ROLES_KEY,
             [context.getHandler(), context.getClass()],
         );
+
         if (!requiredRoles) {
             return true;
         }
@@ -25,7 +26,7 @@ export class RolesGuard implements CanActivate {
         const user: User = request.user;
 
         if (!user) {
-            throw new ForbiddenException("Sesión invalida");
+            throw new ForbiddenException("Sesión inválida");
         }
 
         const hasRole = requiredRoles.some((role) => user.role.value == role);

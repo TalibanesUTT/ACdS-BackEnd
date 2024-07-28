@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, MinLength, IsEmail, MaxLength } from "class-validator";
-//import { IsUnique } from "src/validators/unique.validator";
 
 export class RegisterDto {
     @ApiProperty({ description: "Los nombres del usuario", example: "Juan" })

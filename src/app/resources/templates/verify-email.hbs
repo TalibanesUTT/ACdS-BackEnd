@@ -1,11 +1,92 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <title>Verificación de Correo Electrónico</title>
-</head>
-<body>
-  <h1>Verificación de Correo Electrónico</h1>
-  <p>Por favor, haz clic en el siguiente enlace para verificar tu correo electrónico:</p>
-  <a href="{{url}}">Verificar Correo Electrónico</a>
-</body>
+    <head>
+        <style>
+            body { width: 100% !important; margin: 0; padding: 0;
+            -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; } table
+            { border-spacing: 0; border-collapse: collapse; table-layout: fixed;
+            Margin: 0 auto; } img { border: 0; -ms-interpolation-mode: bicubic;
+            } a { text-decoration: none; } a[x-apple-data-detectors] { color:
+            inherit !important; text-decoration: none !important; }
+            .email-container { width: 100%; max-width: 600px; margin: auto;
+            border: 1px solid #e0e0e0; } .column1 { background-color: #f2494e;
+            text-align: center; padding: 40px 20px; } .column2 { padding: 20px;
+            text-align: center; } h1 { color: white; font-size: 24px;
+            font-family: Arial, sans-serif; } p { color: white; font-size: 16px;
+            font-family: Arial, sans-serif; line-height: 1.4; } .button {
+            display: inline-block; background-color: #bc0505; color: white;
+            text-align: center; font-size: 18px; padding: 15px 30px;
+            border-radius: 100px; border: none; } .button:hover {
+            background-color: #f2494e; cursor: pointer; } footer { text-align:
+            center; margin-top: 20px; } footer p { color: black; font-size:
+            medium; margin: 5px 0; } @media screen and (max-width: 600px) { h1 {
+            font-size: 20px; } p { font-size: 14px; } .button { font-size: 16px;
+            padding: 10px 20px; } }
+        </style>
+    </head>
+    <body>
+        <center>
+            <table role="presentation" class="email-container">
+                <tr>
+                    <td class="column1">
+                        <h1>
+                            {{#if isNewUser}}
+                                ¡Bienvenido
+                            {{else}}
+                                ¡Hola
+                            {{/if}}
+                                {{name}}!
+                        </h1>
+                        <p>
+                            {{#if fromAdmin}}
+                                {{#if isNewUser}}
+                                    Enviamos este correo electrónico para informarte que un
+                                    administrador te ha dado de alta en nuestro sistema, 
+                                    Automécanica Centro de Servicio. A partir de ahora, podrás 
+                                    ingresar a nuestra <a href="https://appdevweb.online/home">
+                                    aplicación</a> con esta dirección de correo electrónico y 
+                                    la siguiente contraseña temporal: <strong>{{password}}</strong>.
+                                    No olvides cambiarla en cuanto ingreses. Además, es necesario
+                                    verificar tu dirección de correo, por lo que te pedimos que
+                                    des clic en el siguiente botón para hacerlo.
+                                {{else}}
+                                    Un administrador de nuestro sistema ha actualizado tu
+                                    correo electrónico con tu nueva dirección. Por favor, da
+                                    clic en el siguiente botón para verificarlo y poder
+                                    continuar utilizando tu cuenta con normalidad.
+                                {{/if}}
+                            {{else}}
+                                {{#if isNewUser}}
+                                    Muchas gracias por registrarte en nuestra
+                                    aplicación. A continuación, es necesario verificar y
+                                    activar tu cuenta para que puedas continuar
+                                    utilizándola. Por favor, da clic en el siguiente
+                                    botón para verificar tu correo electrónico, y en
+                                    breve, recibirás un mensaje de texto a tu teléfono
+                                    celular proporcionado, con el código de verificación
+                                    que necesitas para activar tu cuenta. Por favor,
+                                    envíalo desde la aplicación en cuanto lo recibas.
+                                {{else}}
+                                    Hemos recibido tu solicitud para cambiar tu correo
+                                    electrónico. Por favor, da clic en el siguiente botón
+                                    para verificar tu nuevo correo electrónico y poder 
+                                    continuar utilizando tu cuenta con normalidad.
+                                {{/if}}
+                            {{/if}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="column2">
+                        <a href="{{url}}" class="button">Verificar mi correo</a>
+                        <footer>
+                            <p>¿El enlace de verificación ha expirado?
+                                <a href="{{resendUrl}}">Solicitar uno nuevo</a></p>
+                            <p>@ACdS Integration 2024. Todos los derechos
+                                reservados.</p>
+                        </footer>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </body>
 </html>

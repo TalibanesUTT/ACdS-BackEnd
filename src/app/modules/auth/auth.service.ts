@@ -1,4 +1,11 @@
-import { BadRequestException, Injectable, Inject, forwardRef } from "@nestjs/common";
+import {
+    BadRequestException,
+    Injectable,
+    Inject,
+    forwardRef,
+} from "@nestjs/common";
+import { v4 as uuidv4 } from "uuid";
+
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/app/entities/user.entity";
 import * as bcrypt from "bcrypt";
@@ -15,6 +22,8 @@ import { TextConstants } from "src/constants/text-constants";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { UsersService } from "../users/users.service";
 import { CustomConfigService } from "src/config/custom-config.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class AuthService {
@@ -25,6 +34,7 @@ export class AuthService {
         private readonly randomCodeService: RandomCodeService,
         private readonly vonageService: VonageService,
         private readonly customConfigService: CustomConfigService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private jwtService: JwtService,
         private usersService: UsersService,
         @InjectRepository(User)
@@ -33,7 +43,7 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ email });
-        if (!user || !user.active || !user.emailConfirmed || !user.phoneConfirmed) {
+        if (!user) {
             return null;
         }
 
@@ -42,47 +52,77 @@ export class AuthService {
         return isValid ? user : null;
     }
 
-    async generateToken(user: User) {
-        const payload: JwtPayload = { email: user.email, sub: user.id };
+    async generateToken(user: User): Promise<ApiResponse<string>> {
+        const jti = uuidv4();
+        const payload: JwtPayload = {
+            email: user.email,
+            sub: user.id,
+            jti: jti,
+        };
+        const token = this.jwtService.sign(payload);
+
+        this.whitelistToken(jti);
         return {
-            access_token: this.jwtService.sign(payload),
+            status: 200,
+            message: "Sesión iniciada correctamente.",
+            data: token,
         };
     }
 
     requireMultiFactorAuth(user: User): boolean {
-        return user.role.value === RoleEnum.ADMIN || user.role.value === RoleEnum.ROOT;
+        return (
+            user.role.value === RoleEnum.ADMIN ||
+            user.role.value === RoleEnum.ROOT
+        );
+    }
+
+    requirePhoneVerification(user: User): boolean {
+        return user.role.value === RoleEnum.CUSTOMER && !user.phoneConfirmed && user.changedByAdmin;
     }
 
     async sendMultiFactorAuthEmail(user: User): Promise<ApiResponse<User>> {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
         await this.userRepository.save(user);
+        const codeArray = verificationCode.split("");
 
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointMultiFactor,
-            { sub: user.id, email: user.email, type: 'multi-factor-auth' }
+            { sub: user.id, email: user.email, type: "multi-factor-auth" },
         );
 
         await this.mailerService.addMailJob(
-            user.email, 
-            MailConstants.SubjectMultiFactorAuthMail, 
-            'multi-factor-auth', 
-            { url: emailUrl, name: user.name, code: verificationCode },
-            10000
+            user.email,
+            MailConstants.SubjectMultiFactorAuthMail,
+            "multi-factor-auth",
+            { code: codeArray },
+            10000,
         );
 
         return {
-            statusCode: 200,
-            message: "Código de verificación enviado correctamente.",
+            status: 200,
+            message: "Correo de verificación enviado correctamente.",
             data: user,
             url: emailUrl,
+        };
+    }
+
+    async logout(token: string): Promise<ApiResponse<string>> {
+        const payload = this.jwtService.decode(token) as JwtPayload;
+        await this.blacklistToken(payload.jti);
+
+        return {
+            status: 200,
+            message: "Sesión cerrada correctamente.",
+            data: null,
         };
     }
 
     async register(data: registerData): Promise<ApiResponse<User>> {
         const { email, password, phone, passwordConfirmation, ...rest } = data;
 
-        const existingUserByEmail = !!(await this.usersService.findByEmail(email));
+        const existingUserByEmail =
+            !!(await this.usersService.findByEmail(email));
 
         if (existingUserByEmail) {
             throw new BadRequestException(
@@ -106,11 +146,11 @@ export class AuthService {
         const newUser = await this.userRepository.save(user);
 
         if (newUser) {
-            this.sendEmailVerification(newUser);
+            this.sendEmailVerification(newUser, true, false);
             const phoneUrl = this.createPhoneSignedUrl(newUser);
-            
+
             return {
-                statusCode: 201,
+                status: 201,
                 message: "Usuario registrado correctamente.",
                 data: newUser,
                 url: phoneUrl,
@@ -118,26 +158,36 @@ export class AuthService {
         }
     }
 
-    async sendEmailVerification(user: User) {
-        const resendUrl = this.customConfigService.appUrl + '/auth/resendEmailVerification/' + user.id;
+    async sendEmailVerification(user: User, isNewUser: boolean = true, fromAdmin: boolean = false, password?: string) {
+        password = password || 'no';
+        const subject = isNewUser ? MailConstants.SubjectWelcomeMail : MailConstants.SubjectVerificationMail;
+        const resendUrl =
+            this.customConfigService.appUrl +
+            "/auth/resendEmailVerification/" +
+            isNewUser + "/" + fromAdmin + "/" + password + "/" +
+            user.id;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
-            { sub: user.id, email: user.email, type: 'email-verification'}
+            { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser, fromAdmin: fromAdmin },
         );
 
         await this.mailerService.addMailJob(
-            user.email, 
-            MailConstants.SubjectVerificationMail, 
-            'verify-email', 
-            { url: emailUrl, name: user.name, resendUrl: resendUrl },
-            10000
+            user.email,
+            subject,
+            "verify-email",
+            { url: emailUrl, name: user.name, resendUrl: resendUrl, isNewUser: isNewUser, fromAdmin: fromAdmin, password: password },
+            10000,
         );
     }
 
     createPhoneSignedUrl(user: User): string {
         const phoneUrl = this.signedUrlService.createSignedUrl(
-            MailConstants.EndpointVerifyPhone, 
-            { sub: user.id, phone: user.phoneNumber, type: 'phone-verification'}
+            MailConstants.EndpointVerifyPhone,
+            {
+                sub: user.id,
+                phone: user.phoneNumber,
+                type: "phone-verification",
+            },
         );
 
         return phoneUrl;
@@ -147,13 +197,18 @@ export class AuthService {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
 
-        const text = TextConstants.TextVerificationCodeMessage + verificationCode;
-        await this.vonageService.addSmsJob(
-            user.phoneNumber, 
-            text,
-            12000
-        );
+        const text =
+            TextConstants.TextVerificationCodeMessage + verificationCode;
+        await this.vonageService.addSmsJob(user.phoneNumber, text, 12000);
         await this.userRepository.save(user);
+    }
+
+    async whitelistToken(token: string): Promise<void> {
+        await this.cacheManager.set(token, "true");
+    }
+
+    async blacklistToken(token: string): Promise<void> {
+        await this.cacheManager.del(token);
     }
 }
 
