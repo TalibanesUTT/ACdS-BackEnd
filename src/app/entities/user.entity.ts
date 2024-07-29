@@ -12,6 +12,7 @@ import * as bcrypt from "bcrypt";
 import { Role } from "./role.entity";
 import { Exclude, Transform } from "class-transformer";
 import { Vehicle } from "./vehicle.entity";
+import { Appointment } from "./appointment.entity";
 
 @Entity({
     name: "Users",
@@ -72,10 +73,21 @@ export class User {
 
     @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
     vehicles: Vehicle[];
+    @OneToMany(() => Appointment, (appointment) => appointment.customer)
+    appointments: Promise<Appointment[]>;
 
     async comparePassword(attempt: string): Promise<boolean> {
         return await bcrypt.compare(attempt, this.password);
     }
+
+    // Customer can only have one appointment per day
+    hasAppointmentsOnDate = (date: Date) =>
+        this.appointments.then((appointments) =>
+            appointments.some(
+                (appointment) =>
+                    appointment.date.toDateString() === date.toDateString(),
+            ),
+        );
 
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);
