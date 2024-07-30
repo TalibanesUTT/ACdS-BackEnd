@@ -46,6 +46,32 @@ export class AppointmentsService {
         return this.repository.save(appointment);
     }
 
+    async update(id: number, dto: CreateAppointmentDto) {
+        console.log(id);
+        const appointment = await this.repository.findOneBy({ id });
+        if (!appointment) {
+            throw new NotAcceptableException("Cita no encontrada");
+        }
+
+        const isAvailable = await this.isAvailableAppointment(
+            dto.date,
+            dto.time,
+        );
+
+        if (!isAvailable) {
+            throw new NotAcceptableException(
+                "Ya no hay horarios disponibles para esta hora",
+            );
+        }
+
+        const updatedAppointment = new Appointment({ ...dto });
+        updatedAppointment.validate();
+
+        const finalAppointment = this.repository.merge(appointment, dto);
+
+        return this.repository.save(finalAppointment);
+    }
+
     private async isAvailableAppointment(date: Date, time: string) {
         const appointments = await this.repository.find({
             where: { date, time },

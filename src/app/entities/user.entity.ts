@@ -42,7 +42,6 @@ export class User {
     @Exclude()
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
-
     @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
@@ -81,6 +80,7 @@ export class User {
     }
 
     // Customer can only have one appointment per day
+    @Exclude()
     hasAppointmentsOnDate = (date: Date) =>
         this.appointments.then((appointments) =>
             appointments.some(

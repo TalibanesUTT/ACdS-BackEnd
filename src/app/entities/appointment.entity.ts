@@ -10,7 +10,7 @@ import {
     ValueTransformer,
 } from "typeorm";
 import { NotAcceptableException } from "@nestjs/common";
-import { Type } from "class-transformer";
+import { Exclude, Type } from "class-transformer";
 
 export const timeTransformer: ValueTransformer = {
     to(value: string): string {
@@ -31,6 +31,21 @@ export const timeTransformer: ValueTransformer = {
     name: "Appointments",
 })
 export class Appointment {
+    // Validations:
+    @Exclude()
+    private readonly WORKING_DAYS = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+    ];
+    @Exclude()
+    private readonly WORKING_HOURS = {
+        start: "09:00",
+        end: "18:30",
+    };
+
     constructor(partial: Partial<Appointment>) {
         Object.assign(this, partial);
     }
@@ -49,7 +64,7 @@ export class Appointment {
         default: ValuesConstants.AppointmentsPending,
     })
     status: ValuesConstants;
-    @ManyToOne(() => User, (user) => user.appointments)
+    @ManyToOne(() => User, (user) => user.appointments, { eager: true })
     @JoinColumn({ name: "customer_id" })
     customer: User;
 
@@ -58,25 +73,13 @@ export class Appointment {
         this.date = new Date(this.date);
     }
 
-    // Validations:
-    private readonly WORKING_DAYS = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-    ];
-
-    private readonly WORKING_HOURS = {
-        start: "09:00",
-        end: "18:30",
-    };
-
+    @Exclude()
     isValidDay = () =>
         this.WORKING_DAYS.includes(
             this.date.toLocaleDateString("en-US", { weekday: "long" }),
         );
 
+    @Exclude()
     inWorkingHours = () => {
         const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
         if (!timePattern.test(this.time)) {
@@ -127,7 +130,7 @@ export class Appointment {
             );
         if (!this.inWorkingHours())
             throw new NotAcceptableException(
-                `El horario seleccionado no es válido, las citas solo se pueden agendar de ${this.WORKING_HOURS.start} a ${this.WORKING_HOURS.end}`,
+                `El horario seleccionado no es válido, las citas solo se pueden agendar de ${this.WORKING_HOURS.start} a ${this.WORKING_HOURS.end}, fecha proporcionada: ${this.time}`,
             );
         this.isValidAppointmentDate();
     };
