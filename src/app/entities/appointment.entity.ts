@@ -1,17 +1,45 @@
 import { ValuesConstants } from "src/constants/values-constants";
 import { User } from "./user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    AfterLoad,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    ValueTransformer,
+} from "typeorm";
 import { NotAcceptableException } from "@nestjs/common";
+import { Type } from "class-transformer";
+
+export const timeTransformer: ValueTransformer = {
+    to(value: string): string {
+        // Ensure the value is in hh:mm format
+        if (!/^\d{2}:\d{2}$/.test(value)) {
+            throw new Error("Invalid time format. Expected hh:mm.");
+        }
+        // Append ":00" to store as hh:mm:ss
+        return value;
+    },
+    from(value: string): string {
+        // Return time in hh:mm format
+        return value.slice(0, 5);
+    },
+};
 
 @Entity({
     name: "Appointments",
 })
 export class Appointment {
+    constructor(partial: Partial<Appointment>) {
+        Object.assign(this, partial);
+    }
     @PrimaryGeneratedColumn({ type: "bigint" })
     id: number;
     @Column({ type: "date" })
+    @Type(() => Date)
     date: Date;
-    @Column({ type: "time" })
+    @Column({ type: "time", transformer: timeTransformer })
     time: string;
     @Column()
     reason: string;
@@ -22,10 +50,12 @@ export class Appointment {
     })
     status: ValuesConstants;
     @ManyToOne(() => User, (user) => user.appointments)
+    @JoinColumn({ name: "customer_id" })
     customer: User;
 
-    constructor(partial: Partial<Appointment>) {
-        Object.assign(this, partial);
+    @AfterLoad()
+    transformDate() {
+        this.date = new Date(this.date);
     }
 
     // Validations:
@@ -49,10 +79,12 @@ export class Appointment {
 
     inWorkingHours = () => {
         const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timePattern.test(this.time))
+        if (!timePattern.test(this.time)) {
+            console.log(this.time);
             throw new NotAcceptableException(
                 "El formato de la hora es inválido, Utilizar el formato HH:mm",
             );
+        }
         return (
             this.time >= this.WORKING_HOURS.start &&
             this.time <= this.WORKING_HOURS.end

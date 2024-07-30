@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "src/app/entities/user.entity";
 import { NotAcceptableException } from "@nestjs/common";
-import { Appointment } from "src/app/entities/appointment.entity";
+import { Appointment } from "@/app/entities/appointment.entity";
 
 describe("AppointmentsService", () => {
     let service: AppointmentsService;

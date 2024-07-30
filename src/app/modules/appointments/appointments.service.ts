@@ -13,6 +13,14 @@ export class AppointmentsService {
         private readonly repository: Repository<Appointment>,
     ) {}
 
+    async find(user: User) {
+        return await user.appointments;
+    }
+
+    async findAll() {
+        return this.repository.find();
+    }
+
     async create(dto: CreateAppointmentDto, user: User) {
         const hasAppointment = await user.hasAppointmentsOnDate(dto.date);
         if (hasAppointment) {

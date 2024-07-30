@@ -3,6 +3,9 @@
     "module": "CommonJS",
     "declaration": true,
     "removeComments": true,
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,

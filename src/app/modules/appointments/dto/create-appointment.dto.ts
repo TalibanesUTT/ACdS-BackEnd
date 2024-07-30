@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsString, Matches } from "class-validator";
 import { ValuesConstants } from "src/constants/values-constants";
 
@@ -9,7 +10,11 @@ export class CreateAppointmentDto {
         type: String,
         format: "date",
     })
-    @IsDate()
+    @IsDate({
+        message:
+            "El formato de la fecha es inválido, Utilizar el formato YYYY-MM-DD",
+    })
+    @Type(() => Date)
     date: Date;
     @ApiProperty({
         description: "Hora de la cita (HH:mm)",
@@ -23,7 +28,7 @@ export class CreateAppointmentDto {
     time: string;
     @ApiProperty({
         description: "Razón de la cita",
-        example: "Consulta médica",
+        example: "Auto no enciende",
         type: String,
     })
     @IsString()
@@ -31,8 +36,12 @@ export class CreateAppointmentDto {
     @ApiProperty({
         description: "Estado de la cita",
         example: ValuesConstants.AppointmentsPending,
-        enum: new ValuesConstants(),
+        enum: ValuesConstants,
     })
-    @IsEnum(ValuesConstants)
+    @IsEnum(ValuesConstants, {
+        message: `El estado de la cita debe ser uno de los siguientes valores: ${Object.values(
+            ValuesConstants,
+        ).join(", ")}`,
+    })
     status: ValuesConstants;
 }

@@ -85,7 +85,8 @@ export class User {
         this.appointments.then((appointments) =>
             appointments.some(
                 (appointment) =>
-                    appointment.date.toDateString() === date.toDateString(),
+                    appointment.date.toDateString() ===
+                    new Date(date).toDateString(),
             ),
         );
 
@@ -95,7 +96,7 @@ export class User {
 
     @BeforeInsert()
     @BeforeUpdate()
-    private async _hashPassword() {
+    async _hashPassword() {
         const isHashed =
             this.password.startsWith("$2a$") ||
             this.password.startsWith("$2b$") ||
