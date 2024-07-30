@@ -30,6 +30,7 @@ import { CarBrandsModule } from "./app/modules/car-brands/car-brands.module";
 import { CustomersModule } from "./app/modules/customers/customers.module";
 import { VehiclesModule } from "./app/modules/vehicles/vehicles.module";
 import { CarModelsModule } from "./app/modules/car-models/car-models.module";
+import { AppointmentsModule } from './app/modules/appointments/appointments.module';
 
 @Module({
     imports: [
@@ -71,6 +72,7 @@ import { CarModelsModule } from "./app/modules/car-models/car-models.module";
         CustomersModule,
         VehiclesModule,
         CarModelsModule,
+        AppointmentsModule,
     ],
     controllers: [AppController],
     providers: [

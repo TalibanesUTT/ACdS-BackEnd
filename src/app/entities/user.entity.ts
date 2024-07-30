@@ -12,6 +12,7 @@ import * as bcrypt from "bcrypt";
 import { Role } from "./role.entity";
 import { Exclude, Transform } from "class-transformer";
 import { Vehicle } from "./vehicle.entity";
+import { Appointment } from "./appointment.entity";
 
 @Entity({
     name: "Users",
@@ -41,7 +42,6 @@ export class User {
     @Exclude()
     @Column({ nullable: true, name: "verification_code" })
     verificationCode: string;
-
     @Column({ type: "boolean", default: false, name: "email_confirmed" })
     emailConfirmed: boolean;
 
@@ -72,10 +72,23 @@ export class User {
 
     @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
     vehicles: Vehicle[];
+    @OneToMany(() => Appointment, (appointment) => appointment.customer)
+    appointments: Promise<Appointment[]>;
 
     async comparePassword(attempt: string): Promise<boolean> {
         return await bcrypt.compare(attempt, this.password);
     }
+
+    // Customer can only have one appointment per day
+    @Exclude()
+    hasAppointmentsOnDate = (date: Date) =>
+        this.appointments.then((appointments) =>
+            appointments.some(
+                (appointment) =>
+                    appointment.date.toDateString() ===
+                    new Date(date).toDateString(),
+            ),
+        );
 
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);
@@ -83,7 +96,7 @@ export class User {
 
     @BeforeInsert()
     @BeforeUpdate()
-    private async _hashPassword() {
+    async _hashPassword() {
         const isHashed =
             this.password.startsWith("$2a$") ||
             this.password.startsWith("$2b$") ||
