@@ -142,7 +142,7 @@ export class UserManagementService {
 
         const user = await this.userRepository.findOneBy({ email });
 
-        if (!user || !user.active || !user.emailConfirmed || !user.phoneConfirmed) {
+        if (!user || !user.active || !user.emailConfirmed) {
             throw new NotFoundException("No existe ningún usuario activo con el correo electrónico proporcionado");
         }
 

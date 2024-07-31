@@ -93,6 +93,7 @@ export class SignedUrlController {
             );
         }
 
+        var autoLogin = false;
         user.phoneConfirmed = true;
         user.verificationCode = null;
         if (user.emailConfirmed) {
@@ -100,15 +101,21 @@ export class SignedUrlController {
         }
         if (user.changedByAdmin) {
             user.changedByAdmin = false;
+            autoLogin = true;
         }
 
         await this.usersService.save(user);
 
-        return res.json({ 
-            status: 200,
-            message: "Teléfono verificado correctamente" ,
-            data: null
-        });
+        if (autoLogin) {
+            const response = await this.authService.generateToken(user);
+            return res.status(response.status).json(response);
+        } else {
+            return res.json({ 
+                status: 200,
+                message: "Teléfono verificado correctamente" ,
+                data: null
+            });
+        }
     }
 
     async multiFactorAuth(user: User, code: string, @Res() res: Response) {
