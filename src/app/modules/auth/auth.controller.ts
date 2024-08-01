@@ -9,7 +9,8 @@ import {
     Req,
     Delete,
     HttpCode,
-    BadRequestException
+    BadRequestException,
+    Query
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
@@ -97,15 +98,21 @@ export class AuthController {
         return await this.authService.logout(token);
     }
 
-    @Get("resendEmailVerification/:isNewUser/:fromAdmin/:password/:userId")
+    @Get("resendEmailVerification")
     @HttpCode(200)
-    async resendEmailVerification(@Request() req, @Res() res: Response) {
-        const userId = req.params.userId;
-        const isNewUserBool = req.params.isNewUser === "true";
-        const fromAdminBool = req.params.fromAdmin === "true";
-        const password = req.params.password === "no" ? null : req.params.password;
-        const user = await this.usersService.find(userId);
-        await this.authService.sendEmailVerification(user, isNewUserBool, fromAdminBool, password);
+    async resendEmailVerification(
+        @Query('isNewUser') isNewUser: string,
+        @Query('fromAdmin') fromAdmin: string,
+        @Query('password') password: string,
+        @Query('userId') userId: string,
+        @Res() res: Response
+    ) {
+        const isNewUserBool = isNewUser === "true";
+        const fromAdminBool = fromAdmin === "true";
+        const decodedPassword = password === 'no' ? null : Buffer.from(password, 'base64').toString('utf-8');
+  
+        const user = await this.usersService.find(parseInt(userId));
+        await this.authService.sendEmailVerification(user, isNewUserBool, fromAdminBool, decodedPassword);
 
         return res.render("new-email-verification");
     }

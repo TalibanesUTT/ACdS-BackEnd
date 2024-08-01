@@ -1,7 +1,8 @@
 import { Exclude, Transform } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { CarModel } from "./car-model.entity";
+import { ServiceOrder } from "./service-order.entity";
 
 @Entity({
     name: "Vehicles",
@@ -46,4 +47,7 @@ export class Vehicle {
     @JoinColumn({ name: "model_id" })
     @Transform(({ value }) => value.model)
     model: CarModel;
+
+    @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.vehicle)
+    serviceOrders: ServiceOrder[];
 }

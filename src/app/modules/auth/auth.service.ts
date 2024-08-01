@@ -160,12 +160,10 @@ export class AuthService {
 
     async sendEmailVerification(user: User, isNewUser: boolean = true, fromAdmin: boolean = false, password?: string) {
         password = password || 'no';
+        const encodedPassword = Buffer.from(password).toString("base64");
         const subject = isNewUser ? MailConstants.SubjectWelcomeMail : MailConstants.SubjectVerificationMail;
         const resendUrl =
-            this.customConfigService.appUrl +
-            "/auth/resendEmailVerification/" +
-            isNewUser + "/" + fromAdmin + "/" + password + "/" +
-            user.id;
+            `${this.customConfigService.appUrl}/auth/resendEmailVerification?isNewUser=${isNewUser}&fromAdmin=${fromAdmin}&password=${encodedPassword}&userId=${user.id}`;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
             { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser, fromAdmin: fromAdmin },
