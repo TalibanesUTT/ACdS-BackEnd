@@ -13,7 +13,7 @@ export class UpdateAppointmentDto {
     @IsOptional()
     @IsDate()
     @Type(() => Date)
-    date: string;
+    date: Date;
 
     @ApiPropertyOptional({
         description: "Hora de la cita (HH:mm)",

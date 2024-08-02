@@ -4,6 +4,7 @@ import { CreateAppointmentDto } from "./dto/create-appointment.dto";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Appointment } from "src/app/entities/appointment.entity";
+import { UpdateAppointmentDto } from "./dto/update-appointment.dtop";
 
 @Injectable()
 export class AppointmentsService {
@@ -46,7 +47,7 @@ export class AppointmentsService {
         return this.repository.save(appointment);
     }
 
-    async update(id: number, dto: CreateAppointmentDto) {
+    async update(id: number, dto: UpdateAppointmentDto) {
         console.log(id);
         const appointment = await this.repository.findOneBy({ id });
         if (!appointment) {
