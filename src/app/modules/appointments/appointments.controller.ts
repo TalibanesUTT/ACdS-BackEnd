@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Param, Post, Put } from "@nestjs/common";
 import { ApiBearerAuth, ApiParam, ApiTags } from "@nestjs/swagger";
 import { AppointmentsService } from "./appointments.service";
 import { CreateAppointmentDto } from "./dto/create-appointment.dto";
@@ -52,7 +52,7 @@ export class AppointmentsController {
 
     @ApiBearerAuth()
     @ApiParam({ name: "id", type: Number, description: "Id de la cita" })
-    @Post(":id")
+    @Put(":id")
     async update(
         @Body() dto: UpdateAppointmentDto,
         @Param("id") id: number,

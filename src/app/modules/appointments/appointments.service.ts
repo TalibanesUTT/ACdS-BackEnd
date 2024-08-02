@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException } from "@nestjs/common";
+import {
+    Injectable,
+    NotAcceptableException,
+    NotFoundException,
+} from "@nestjs/common";
 import { User } from "src/app/entities/user.entity";
 import { CreateAppointmentDto } from "./dto/create-appointment.dto";
 import { Repository } from "typeorm";
@@ -15,11 +19,25 @@ export class AppointmentsService {
     ) {}
 
     async find(user: User) {
-        return await user.appointments;
+        const userAppoinments = await user.appointments;
+        const hasAppoinments = userAppoinments.length > 0;
+
+        if (!hasAppoinments) {
+            throw new NotFoundException("No tienes citas programadas");
+        }
+
+        return userAppoinments;
     }
 
     async findAll() {
-        return this.repository.find();
+        const appointments = await this.repository.find();
+        const haveFoundAppointments = appointments.length > 0;
+
+        if (!haveFoundAppointments) {
+            throw new NotFoundException("No hay citas programadas");
+        }
+
+        return appointments;
     }
 
     async create(dto: CreateAppointmentDto, user: User) {
