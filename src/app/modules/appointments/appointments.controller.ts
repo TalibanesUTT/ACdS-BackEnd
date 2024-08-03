@@ -6,7 +6,7 @@ import { GetUser } from "src/config/user.decorator";
 import { User } from "src/app/entities/user.entity";
 import { ApiResponse } from "@/app/interfaces/api-response.interface";
 import { Appointment } from "@/app/entities/appointment.entity";
-import { UpdateAppointmentDto } from "./dto/update-appointment.dtop";
+import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
 
 @ApiTags("Appointments")
 @Controller("appointments")

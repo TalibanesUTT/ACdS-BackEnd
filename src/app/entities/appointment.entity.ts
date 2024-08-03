@@ -41,6 +41,7 @@ export class Appointment {
         "Wednesday",
         "Thursday",
         "Friday",
+        "Saturday",
     ];
     @Exclude()
     private readonly WORKING_HOURS = {

@@ -176,6 +176,10 @@ export class UserManagementService {
             throw new BadRequestException("La contraseña actual es incorrecta");
         }
 
+        if (actualPassword === newPassword) {
+            throw new BadRequestException("La nueva contraseña tiene que ser diferente a la actual");
+        }
+
         user.password = await bcrypt.hash(newPassword, 10);
         await this.userRepository.save(user);
 

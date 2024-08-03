@@ -119,7 +119,7 @@ export class AuthService {
     }
 
     async register(data: registerData): Promise<ApiResponse<User>> {
-        const { email, password, phone, passwordConfirmation, ...rest } = data;
+        const { email, password, passwordConfirmation, ...rest } = data;
 
         const existingUserByEmail =
             !!(await this.usersService.findByEmail(email));
@@ -139,7 +139,6 @@ export class AuthService {
         const user = this.userRepository.create({
             email,
             password: hashedPassword,
-            phoneNumber: phone,
             ...rest,
         });
 
@@ -214,7 +213,7 @@ interface registerData {
     name: string;
     lastName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
     password: string;
     passwordConfirmation: string;
 }
