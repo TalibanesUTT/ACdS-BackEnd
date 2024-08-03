@@ -1,5 +1,5 @@
 import { Controller, Get, HttpCode, Param, ParseIntPipe } from "@nestjs/common";
-import { ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CarModelsService } from "./car-models.service";
 import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
@@ -8,6 +8,7 @@ import { CarModel } from "src/app/entities/car-model.entity";
 
 @Controller("car-models")
 @ApiTags("car-models")
+@ApiBearerAuth()
 export class CarModelsController { 
     constructor(
         private readonly carModelsService: CarModelsService

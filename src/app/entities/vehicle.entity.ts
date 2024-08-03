@@ -45,7 +45,6 @@ export class Vehicle {
         eager: true,
     })
     @JoinColumn({ name: "model_id" })
-    @Transform(({ value }) => value.model)
     model: CarModel;
 
     @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.vehicle)

@@ -1,5 +1,5 @@
 import { Controller, Get, HttpCode } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ServicesService } from "./services.service";
 import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
@@ -8,6 +8,7 @@ import { Service } from "src/app/entities/service.entity";
 
 @Controller("services")
 @ApiTags("services")
+@ApiBearerAuth()
 export class ServicesController {
     constructor(
         private readonly service: ServicesService
