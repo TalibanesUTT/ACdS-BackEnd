@@ -1,28 +1,43 @@
 import { Exclude, Transform } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { CarModel } from "./car-model.entity";
+import { ServiceOrder } from "./service-order.entity";
 
 @Entity({
     name: "Vehicles",
 })
 export class Vehicle {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+        type: "bigint",
+    })
     id: number;
 
     @Column({
         unique: true,
         name: "serial_number",
+        type: "nvarchar",
+        length: 20,
     })
     serialNumber: string;
 
-    @Column()
+    @Column({
+        type: "smallint",
+        unsigned: true,
+    })
     year: number;
 
-    @Column()
+    @Column({
+        type: "varchar",
+        length: 25,
+    })
     color: string;
 
-    @Column()
+    @Column({
+        type: "nvarchar",
+        length: 15,
+    })
     plates: string;
 
     @Exclude()
@@ -44,6 +59,8 @@ export class Vehicle {
         eager: true,
     })
     @JoinColumn({ name: "model_id" })
-    @Transform(({ value }) => value.model)
     model: CarModel;
+
+    @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.vehicle)
+    serviceOrders: ServiceOrder[];
 }

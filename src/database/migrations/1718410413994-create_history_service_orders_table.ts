@@ -41,7 +41,19 @@ export class CreateHistoryServiceOrdersTable1718410413994
                         type: "varchar",
                         length: "35",
                         isNullable: false,
-                        default: "'En revisión'",
+                        default: "'Recibido'",
+                    }),
+                    new TableColumn({
+                        name: "comments",
+                        type: "nvarchar",
+                        length: "255",
+                        isNullable: true,
+                    }),
+                    new TableColumn({
+                        name: "rollback",
+                        type: "boolean",
+                        isNullable: false,
+                        default: false,
                     }),
                     new TableColumn({
                         name: "time",

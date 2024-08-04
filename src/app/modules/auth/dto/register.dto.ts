@@ -58,5 +58,5 @@ export class RegisterDto {
         message:
             "El número de teléfono puede contener un máximo de 10 caracteres",
     })
-    phone: string;
+    phoneNumber: string;
 }

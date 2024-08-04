@@ -7,10 +7,17 @@ import { Vehicle } from "./vehicle.entity";
     name: "CarModels",
 })
 export class CarModel {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: "bigint",
+        unsigned: true,
+    })
     id: number;
 
-    @Column()
+    @Column({
+        type: "nvarchar",
+        length: 100,
+
+    })
     model: string;
 
     @ManyToOne(() => CarBrand, (brand) => brand.models, {

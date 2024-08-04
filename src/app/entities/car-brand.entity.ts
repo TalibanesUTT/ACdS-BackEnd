@@ -5,12 +5,16 @@ import { CarModel } from "./car-model.entity";
     name: "CarBrands",
 })
 export class CarBrand {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+    })
     id: number;
 
     @Column({
         unique: true,
         name: "brand",
+        type: "varchar",
+        length: 70,
     })
     name: string;
 

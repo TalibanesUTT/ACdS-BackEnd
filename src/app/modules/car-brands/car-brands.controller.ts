@@ -2,13 +2,14 @@ import { Body, Controller, Get, Param, Post, Put, HttpCode } from "@nestjs/commo
 import { CarBrandsService } from "./car-brands.service";
 import { CarBrand } from "src/app/entities/car-brand.entity";
 import { CreateCarBrandDto, UpdateCarBrandDto } from "./dto/car-brand.dto";
-import { ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiParam, ApiTags } from "@nestjs/swagger";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
 import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
 
 @Controller("car-brands")
 @ApiTags("car-brands")
+@ApiBearerAuth()
 export class CarBrandsController {
     constructor(
         private readonly carBrandsService: CarBrandsService,

@@ -102,7 +102,6 @@ export class CustomersService {
         }
 
         if (phoneNumber && phoneNumber !== customer.phoneNumber) {
-            customer.active = false;
             customer.phoneConfirmed = false;
             customer.changedByAdmin = true;
         }

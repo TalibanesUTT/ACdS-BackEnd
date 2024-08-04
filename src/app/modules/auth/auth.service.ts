@@ -119,7 +119,7 @@ export class AuthService {
     }
 
     async register(data: registerData): Promise<ApiResponse<User>> {
-        const { email, password, phone, passwordConfirmation, ...rest } = data;
+        const { email, password, passwordConfirmation, ...rest } = data;
 
         const existingUserByEmail =
             !!(await this.usersService.findByEmail(email));
@@ -139,7 +139,6 @@ export class AuthService {
         const user = this.userRepository.create({
             email,
             password: hashedPassword,
-            phoneNumber: phone,
             ...rest,
         });
 
@@ -160,12 +159,10 @@ export class AuthService {
 
     async sendEmailVerification(user: User, isNewUser: boolean = true, fromAdmin: boolean = false, password?: string) {
         password = password || 'no';
+        const encodedPassword = Buffer.from(password).toString("base64");
         const subject = isNewUser ? MailConstants.SubjectWelcomeMail : MailConstants.SubjectVerificationMail;
         const resendUrl =
-            this.customConfigService.appUrl +
-            "/auth/resendEmailVerification/" +
-            isNewUser + "/" + fromAdmin + "/" + password + "/" +
-            user.id;
+            `${this.customConfigService.appUrl}/auth/resendEmailVerification?isNewUser=${isNewUser}&fromAdmin=${fromAdmin}&password=${encodedPassword}&userId=${user.id}`;
         const emailUrl = this.signedUrlService.createSignedUrl(
             MailConstants.EndpointVerifyEmail,
             { sub: user.id, email: user.email, type: "email-verification", isNewUser: isNewUser, fromAdmin: fromAdmin },
@@ -216,7 +213,7 @@ interface registerData {
     name: string;
     lastName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
     password: string;
     passwordConfirmation: string;
 }

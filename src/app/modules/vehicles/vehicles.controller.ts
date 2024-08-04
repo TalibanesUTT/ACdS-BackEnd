@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiParam, ApiTags } from "@nestjs/swagger";
 import { VehiclesService } from "./vehicles.service";
 import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
@@ -9,6 +9,7 @@ import { Vehicle } from "src/app/entities/vehicle.entity";
 
 @Controller("vehicles")
 @ApiTags("vehicles")
+@ApiBearerAuth()
 export class VehiclesController { 
     constructor(
         private readonly vehiclesService: VehiclesService,
@@ -38,7 +39,7 @@ export class VehiclesController {
          };
     }
 
-    @Get("my-vehicles/:ownerId")
+    @Get("owner/:ownerId")
     @HttpCode(200)
     @ApiParam({ name: "ownerId", type: "number", description: "The id of the owner" })
     async getVehiclesByOwner(@Param("ownerId", ParseIntPipe) ownerId: number): Promise<ApiResponse<Vehicle[]>> {

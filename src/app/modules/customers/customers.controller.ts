@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { CustomersService } from "./customers.service";
-import { ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Roles } from "src/config/roles.decorator";
 import { RoleEnum } from "src/app/entities/role.entity";
 import { ApiResponse } from "src/app/interfaces/api-response.interface";
@@ -10,6 +10,7 @@ import { UpdateUserDto } from "../user-management/dto/update-user.dto";
 
 @Controller("customers")
 @ApiTags("customers")
+@ApiBearerAuth()
 export class CustomersController {
     constructor(
         private readonly service: CustomersService,

@@ -142,7 +142,7 @@ export class UserManagementService {
 
         const user = await this.userRepository.findOneBy({ email });
 
-        if (!user || !user.active || !user.emailConfirmed || !user.phoneConfirmed) {
+        if (!user || !user.active || !user.emailConfirmed) {
             throw new NotFoundException("No existe ningún usuario activo con el correo electrónico proporcionado");
         }
 
@@ -174,6 +174,10 @@ export class UserManagementService {
 
         if (!isPasswordValid) {
             throw new BadRequestException("La contraseña actual es incorrecta");
+        }
+
+        if (actualPassword === newPassword) {
+            throw new BadRequestException("La nueva contraseña tiene que ser diferente a la actual");
         }
 
         user.password = await bcrypt.hash(newPassword, 10);

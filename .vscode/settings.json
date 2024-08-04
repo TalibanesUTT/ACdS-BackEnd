@@ -3,6 +3,7 @@
         "auth",
         "deploy",
         "user-management",
-        "vehicles"
+        "vehicles",
+        "service-orders"
     ]
 }
