@@ -1,4 +1,4 @@
-import { ValuesConstants } from "@/constants/values-constants";
+import { AppointmentStatus } from "@/constants/values-constants";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
@@ -35,10 +35,10 @@ export class UpdateAppointmentDto {
 
     @ApiPropertyOptional({
         description: "Estado de la cita",
-        example: ValuesConstants.ServiceOrdersOnReview,
-        enum: ValuesConstants,
+        example: AppointmentStatus.AppointmentsCompleted,
+        enum: AppointmentStatus,
     })
     @IsOptional()
-    @IsEnum(ValuesConstants)
-    status: ValuesConstants;
+    @IsEnum(AppointmentStatus)
+    status: AppointmentStatus;
 }

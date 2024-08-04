@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsString, Matches } from "class-validator";
-import { ValuesConstants } from "src/constants/values-constants";
+import { AppointmentStatus } from "src/constants/values-constants";
 
 export class CreateAppointmentDto {
     @ApiProperty({
@@ -35,13 +35,13 @@ export class CreateAppointmentDto {
     reason: string;
     @ApiProperty({
         description: "Estado de la cita",
-        example: ValuesConstants.AppointmentsPending,
-        enum: ValuesConstants,
+        example: AppointmentStatus.AppointmentsPending,
+        enum: AppointmentStatus,
     })
-    @IsEnum(ValuesConstants, {
+    @IsEnum(AppointmentStatus, {
         message: `El estado de la cita debe ser uno de los siguientes valores: ${Object.values(
-            ValuesConstants,
+            AppointmentStatus,
         ).join(", ")}`,
     })
-    status: ValuesConstants;
+    status: AppointmentStatus;
 }

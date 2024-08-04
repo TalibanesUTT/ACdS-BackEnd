@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateServiceOrderDto {
     @ApiProperty({ description: "The file number of the service order", example: "SO-0001" })
     @IsNotEmpty({ message: "El número de expediente es obligatorio" })
     @IsString()
+    @MaxLength(15, { message: "El número de expediente puede contener un máximo de 15 caracteres" })
     fileNumber: string;
     
     @ApiProperty({ description: "The id of the appointment", example: 1, required: false })
@@ -37,6 +38,7 @@ export class UpdateServiceOrderDto {
     @ApiProperty({ description: "The file number of the service order", example: "SO-0001", required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(15, { message: "El número de expediente puede contener un máximo de 15 caracteres" })
     fileNumber?: string;
     
     @ApiProperty({ description: "The id of the appointment", example: 1, required: false })

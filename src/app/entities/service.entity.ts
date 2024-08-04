@@ -5,12 +5,16 @@ import { ServiceOrder } from "./service-order.entity";
     name: "Services",  
 })
 export class Service {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+    })
     id: number;
 
     @Column({
         unique: true,
         name: "service",
+        type: "varchar",
+        length: 30,
     })
     name: string;
 

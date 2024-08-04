@@ -8,22 +8,36 @@ import { ServiceOrder } from "./service-order.entity";
     name: "Vehicles",
 })
 export class Vehicle {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+        type: "bigint",
+    })
     id: number;
 
     @Column({
         unique: true,
         name: "serial_number",
+        type: "nvarchar",
+        length: 20,
     })
     serialNumber: string;
 
-    @Column()
+    @Column({
+        type: "smallint",
+        unsigned: true,
+    })
     year: number;
 
-    @Column()
+    @Column({
+        type: "varchar",
+        length: 25,
+    })
     color: string;
 
-    @Column()
+    @Column({
+        type: "nvarchar",
+        length: 15,
+    })
     plates: string;
 
     @Exclude()

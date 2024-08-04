@@ -1,4 +1,4 @@
-import { ValuesConstants } from "src/constants/values-constants";
+import { AppointmentStatus } from "src/constants/values-constants";
 import { User } from "./user.entity";
 import {
     AfterLoad,
@@ -52,21 +52,43 @@ export class Appointment {
     constructor(partial: Partial<Appointment>) {
         Object.assign(this, partial);
     }
-    @PrimaryGeneratedColumn({ type: "bigint" })
+
+    @PrimaryGeneratedColumn({ 
+        type: "bigint",
+        unsigned: true,
+    })
     id: number;
+
     @Column({ type: "date" })
     @Type(() => Date)
     date: Date;
-    @Column({ type: "time", transformer: timeTransformer })
+
+    @Column({ 
+        type: "time",
+        transformer: timeTransformer 
+    })
     time: string;
-    @Column()
+
+    @Column({
+        type: "nvarchar",
+        length: 300,
+    })
     reason: string;
+
     @Column({
         type: "enum",
-        enum: ValuesConstants,
-        default: ValuesConstants.AppointmentsPending,
+        enum: AppointmentStatus,
+        default: AppointmentStatus.AppointmentsPending,
     })
-    status: ValuesConstants;
+    status: AppointmentStatus;
+
+    @Column({
+        name: "create_date",
+        type: "timestamp",
+        default: () => "CURRENT_TIMESTAMP",
+    })
+    createDate: Date;
+
     @ManyToOne(() => User, (user) => user.appointments, { eager: true })
     @JoinColumn({ name: "customer_id" })
     customer: User;

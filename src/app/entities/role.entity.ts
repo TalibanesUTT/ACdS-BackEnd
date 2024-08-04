@@ -12,12 +12,15 @@ export enum RoleEnum {
     name: "Roles",
 })
 export class Role {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+    })
     id: number;
 
     @Column({
         enum: RoleEnum,
         name: "role",
+        unique: true,
     })
     value: RoleEnum;
 

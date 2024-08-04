@@ -1,23 +1,33 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Vehicle } from "./vehicle.entity";
 import { Appointment } from "./appointment.entity";
 import { Service } from "./service.entity";
+import { ServiceOrderDetail } from "./service-order-detail.entity";
+import { Expose, Transform } from "class-transformer";
+import { HistoryServerOrder } from "./history-server-order.entity";
+import { ServiceOrderStatus } from "@/constants/values-constants";
 
 @Entity({
     name: 'ServiceOrders'
 })
 export class ServiceOrder {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        unsigned: true,
+        type: 'bigint'
+    })
     id: number;
 
     @Column({
         unique: true,
-        name: 'file_number'
+        name: 'file_number',
+        type: 'nvarchar',
+        length: 15,
     })
     fileNumber: string;
 
     @Column({
-        name: 'initial_mileage'
+        name: 'initial_mileage',
+        unsigned: true,
     })
     initialMileage: number;
 
@@ -61,4 +71,33 @@ export class ServiceOrder {
         }
     })
     services: Service[];
+
+    @OneToOne(() => ServiceOrderDetail, (detail) => detail.serviceOrder, {
+        eager: true,
+        cascade: true
+    })
+    @Transform(({ value }) => {
+        if (value) {
+            const { serviceOrder, ...rest } = value;
+            return rest;
+        }
+        return null;
+    })
+    detail: ServiceOrderDetail;
+
+    @OneToMany(() => HistoryServerOrder, (history) => history.serviceOrder, {
+        eager: true
+    })
+    history: HistoryServerOrder[];
+
+    @Expose()
+    get actualStatus(): ServiceOrderStatus | null {
+        if (!this.history){
+            return null;
+        }
+        const validStatus = this.history
+            .filter(history => !history.rollback)
+            .sort((a, b) => b.time.getTime() - a.time.getTime());
+        return validStatus.length > 0 ? validStatus[0].status : null;
+    }
 }
