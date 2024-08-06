@@ -13,6 +13,7 @@ import { Role } from "./role.entity";
 import { Exclude, Transform } from "class-transformer";
 import { Vehicle } from "./vehicle.entity";
 import { Appointment } from "./appointment.entity";
+import { AppointmentStatus } from "@/constants/values-constants";
 
 @Entity({
     name: "Users",
@@ -140,6 +141,7 @@ export class User {
         const appointments = await this.appointments;
         return appointments.some(
             (appointment) =>
+                appointment.status !== AppointmentStatus.AppointmentsCancelled &&
                 appointment.date.toDateString() ===
                 new Date(date).toDateString(),
         );

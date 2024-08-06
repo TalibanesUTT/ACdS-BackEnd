@@ -1,9 +1,17 @@
-import { AppointmentStatus } from "@/constants/values-constants";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsDate, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class UpdateAppointmentDto {
+    @ApiPropertyOptional({
+        description: "El id del usuario",
+        example: 1,
+        type: Number,
+    })
+    @IsOptional()
+    @IsNumber()
+    userId?: number;
+
     @ApiPropertyOptional({
         description: "Fecha de la cita (YYYY-MM-DD)",
         example: "2024-08-01",
@@ -13,7 +21,7 @@ export class UpdateAppointmentDto {
     @IsOptional()
     @IsDate()
     @Type(() => Date)
-    date: Date;
+    date?: Date;
 
     @ApiPropertyOptional({
         description: "Hora de la cita (HH:mm)",
@@ -22,7 +30,7 @@ export class UpdateAppointmentDto {
     })
     @IsOptional()
     @IsString()
-    time: string;
+    time?: string;
 
     @ApiPropertyOptional({
         description: "Razón de la cita",
@@ -31,14 +39,5 @@ export class UpdateAppointmentDto {
     })
     @IsOptional()
     @IsString()
-    reason: string;
-
-    @ApiPropertyOptional({
-        description: "Estado de la cita",
-        example: AppointmentStatus.AppointmentsCompleted,
-        enum: AppointmentStatus,
-    })
-    @IsOptional()
-    @IsEnum(AppointmentStatus)
-    status: AppointmentStatus;
+    reason?: string;
 }

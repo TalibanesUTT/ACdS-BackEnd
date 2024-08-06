@@ -13,6 +13,7 @@ export const createDataSource = (configService: CustomConfigService): DataSource
         migrationsTableName: "_migrations",
         entities: ["dist/**/*.entity{.ts,.js}"],
         migrationsRun: true,
+        timezone: "local",
         logging: true,
         synchronize: false,
     });

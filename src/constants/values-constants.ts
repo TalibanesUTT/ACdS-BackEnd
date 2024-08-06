@@ -1,6 +1,6 @@
 export enum AppointmentStatus {
     AppointmentsPending = "Pendiente",
-    AppointmentsCanceled = "Cancelada",
+    AppointmentsCancelled = "Cancelada",
     AppointmentsCompleted = "Completada",
 }
 

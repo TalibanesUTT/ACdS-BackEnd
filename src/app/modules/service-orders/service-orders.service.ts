@@ -11,7 +11,7 @@ import { CreateServiceOrderDetailDto } from "./dto/service-order-detail.dto";
 import { ServiceOrderDetail } from "@/app/entities/service-order-detail.entity";
 import { User } from "@/app/entities/user.entity";
 import { HistoryServerOrder } from "@/app/entities/history-server-order.entity";
-import { ServiceOrderStatus } from "@/constants/values-constants";
+import { AppointmentStatus, ServiceOrderStatus } from "@/constants/values-constants";
 import { TextConstants } from "@/constants/text-constants";
 import { StatusDto } from "./dto/status.dto";
 import { ServiceOrderStatusFlow } from "./status-flow";
@@ -98,6 +98,9 @@ export class ServiceOrdersService {
             if (!appointment) {
                 throw new NotFoundException('Cita no encontrada');
             }
+
+            appointment.status = AppointmentStatus.AppointmentsCompleted;
+            await this.appointmentRepository.save(appointment);
         }
 
         const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
@@ -142,7 +145,7 @@ export class ServiceOrdersService {
             }
         }
 
-        if (vehicleId) {
+        if (vehicleId && vehicleId !== order.vehicle.id) {
             const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
             if (!vehicle) {
                 throw new NotFoundException('Vehículo no encontrado');
@@ -150,12 +153,19 @@ export class ServiceOrdersService {
             order.vehicle = vehicle;
         }
 
-        if (appointmentId !== undefined && appointmentId !== null) { 
+        if (appointmentId !== undefined && appointmentId !== null && appointmentId !== order.appointment.id) { 
             const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
             if (!appointment) {
                 throw new NotFoundException('Cita no encontrada');
             }
-            order.appointment = appointment;
+
+            if (order.appointment) {
+                order.appointment.status = AppointmentStatus.AppointmentsPending;
+                await this.appointmentRepository.save(order.appointment);
+            }
+
+            appointment.status = AppointmentStatus.AppointmentsCompleted;
+            await this.appointmentRepository.save(appointment);
         }
 
         if (servicesIds !== undefined && servicesIds !== null) {

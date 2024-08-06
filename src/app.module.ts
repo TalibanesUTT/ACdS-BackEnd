@@ -33,6 +33,8 @@ import { CarModelsModule } from "./app/modules/car-models/car-models.module";
 import { AppointmentsModule } from './app/modules/appointments/appointments.module';
 import { ServicesModule } from "./app/modules/services/services.module";
 import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders.module";
+import { ScheduleModule } from "@nestjs/schedule";
+import { TasksModule } from "./app/services/tasks/tasks.module";
 
 @Module({
     imports: [
@@ -61,6 +63,7 @@ import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders
             }),
         }),
 
+        ScheduleModule.forRoot(),
         SignedUrlModule,
         MailerModule,
         RandomCodeModule,
@@ -77,6 +80,7 @@ import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders
         AppointmentsModule,
         ServicesModule,
         ServiceOrdersModule,
+        TasksModule,
     ],
     controllers: [AppController],
     providers: [
