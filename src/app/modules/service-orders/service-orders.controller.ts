@@ -55,6 +55,18 @@ export class ServiceOrdersController {
         }
     }
 
+    @Get("vehicle/:vehicleId")
+    @HttpCode(200)
+    @ApiParam({ name: "vehicleId", type: "number", description: "The id of the vehicle" })
+    async getServiceOrdersByVehicle(@Param("vehicleId", ParseIntPipe) vehicleId: number): Promise<ApiResponse<ServiceOrder[]>> {
+        const orders = await this.serviceOrdersService.findByVehicle(vehicleId);
+        return {
+            status: 200,
+            message: null,
+            data: orders,
+        }
+    }
+
     @Post()
     @HttpCode(201)
     @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)

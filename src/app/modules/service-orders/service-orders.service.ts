@@ -84,6 +84,25 @@ export class ServiceOrdersService {
         return orders;
     }
 
+    async findByVehicle(vehicleId: number): Promise<ServiceOrder[]> {
+        const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
+
+        if (!vehicle) {
+            throw new NotFoundException('Vehículo no encontrado');
+        }
+
+        const orders = await this.serviceOrderRepository.find({
+            where: {
+                vehicle: { id: vehicle.id }
+            }
+        })
+
+        if (!orders.length) {
+            throw new NotFoundException('No hay órdenes de servicio registradas para este vehículo');
+        }
+        
+        return orders;
+    }
     async create(data: CreateServiceOrderDto, user: User): Promise<ServiceOrder> {
         const { vehicleId, appointmentId, servicesIds, fileNumber, ...rest } = data;
 

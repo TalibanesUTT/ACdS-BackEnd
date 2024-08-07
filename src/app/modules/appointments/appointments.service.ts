@@ -190,7 +190,7 @@ export class AppointmentsService {
     }
 
     async sendAppointmentNotification(appointment: Appointment) {
-        const formattedDate = format(appointment.date, "dd-MM-yyyy");
+        const formattedDate = format(appointment.date, "dd/MM/yyyy");
         await this.mailerService.addMailJob(
             appointment.customer.email,
             MailConstants.SubjectAppointmentForTodayMail,
