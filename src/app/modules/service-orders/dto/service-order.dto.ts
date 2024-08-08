@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateServiceOrderDto {
     @ApiProperty({ description: "The file number of the service order", example: "SO-0001" })
@@ -27,6 +27,13 @@ export class CreateServiceOrderDto {
     @IsNotEmpty({ message: "Las observaciones son obligatorias" })
     @IsString()
     notes: string;
+
+    @ApiProperty({ description: "Who has to receive the email notifications?", example: "john.doe@gmail.com", required: false })
+    @IsOptional()
+    @IsString()
+    @IsEmail({}, { message: "El correo electrónico no es válido" })
+    @MaxLength(100, { message: "El correo electrónico puede contener un máximo de 100 caracteres" })
+    notifyTo?: string;
 
     @ApiProperty({ description: "The id of the services", example: [1, 2, 3], required: false })
     @IsOptional()
@@ -60,6 +67,13 @@ export class UpdateServiceOrderDto {
     @IsOptional()
     @IsString()
     notes?: string;
+
+    @ApiProperty({ description: "Who has to receive the email notifications?", example: "john.doe@gmail.com", required: false })
+    @IsOptional()
+    @IsString()
+    @IsEmail({}, { message: "El correo electrónico no es válido" })
+    @MaxLength(100, { message: "El correo electrónico puede contener un máximo de 100 caracteres" })
+    notifyTo?: string;
 
     @ApiProperty({ description: "The id of the services", example: [1, 2, 3], required: false })
     @IsOptional()

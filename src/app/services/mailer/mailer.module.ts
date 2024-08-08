@@ -2,11 +2,11 @@ import { Module } from "@nestjs/common";
 import { MailerModule as NestMailerModule } from "@nestjs-modules/mailer";
 import { CustomConfigModule } from "src/config/custom-config.module";
 import { CustomConfigService } from "src/config/custom-config.service";
-import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { MailerService } from "./mailer.service";
 import { join } from "path";
 import { BullModule } from "@nestjs/bullmq";
 import { MailProcessor } from "./mail.processor";
+import { CustomHandlebarsAdapter } from "@/config/custom-handlebars-adapter";
 
 @Module({
     imports: [
@@ -28,7 +28,7 @@ import { MailProcessor } from "./mail.processor";
                 },
                 template: {
                     dir: join(__dirname, '..', '..', 'resources', 'templates'),
-                    adapter: new HandlebarsAdapter(),
+                    adapter: new CustomHandlebarsAdapter(),
                     options: {
                         strict: true,
                     },
