@@ -8,7 +8,7 @@ import { ApiResponse } from "@/app/interfaces/api-response.interface";
 import { Appointment } from "@/app/entities/appointment.entity";
 import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
 
-@ApiTags("Appointments")
+@ApiTags("appointments")
 @Controller("appointments")
 @ApiBearerAuth()
 export class AppointmentsController {
@@ -30,6 +30,17 @@ export class AppointmentsController {
     @HttpCode(200)
     async findAll(): Promise<ApiResponse<Appointment[]>> {
         const appointments = await this.service.findAll();
+        return {
+            message: null,
+            data: appointments,
+            status: HttpStatus.OK,
+        };
+    }
+
+    @Get("pending")
+    @HttpCode(200)
+    async findPending(): Promise<ApiResponse<Appointment[]>> {
+        const appointments = await this.service.findPendingAppointments();
         return {
             message: null,
             data: appointments,
@@ -80,7 +91,7 @@ export class AppointmentsController {
         };
     }
 
-    @ApiParam({ name: "id", type: Number, description: "Id del cliente" })
+    @ApiParam({ name: "userId", type: Number, description: "Id del cliente" })
     @Get("appointmentsDates/:userId")
     @HttpCode(200)
     async getPendingAppointemntsByUser(@Param("userId", ParseIntPipe) userId: number): Promise<ApiResponse<Date[]>> {

@@ -136,14 +136,4 @@ export class User {
             this.password = await bcrypt.hash(this.password, 10);
         }
     }
-    
-    async hasAppointmentsOnDate(date: Date): Promise<boolean> { 
-        const appointments = await this.appointments;
-        return appointments.some(
-            (appointment) =>
-                appointment.status !== AppointmentStatus.AppointmentsCancelled &&
-                appointment.date.toDateString() ===
-                new Date(date).toDateString(),
-        );
-    }
 }
