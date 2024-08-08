@@ -67,6 +67,18 @@ export class ServiceOrdersController {
         }
     }
 
+    @Get("pendings/status")
+    @HttpCode(200)
+    @Roles(RoleEnum.MECHANIC)
+    async getPendingServiceOrders(): Promise<ApiResponse<ServiceOrder[]>> {
+        const orders = await this.serviceOrdersService.findPending();
+        return {
+            status: 200,
+            message: null,
+            data: orders,
+        }
+    }
+
     @Post()
     @HttpCode(201)
     @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)

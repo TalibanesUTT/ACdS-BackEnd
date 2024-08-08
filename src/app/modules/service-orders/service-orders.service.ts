@@ -4,7 +4,7 @@ import { Service } from "@/app/entities/service.entity";
 import { Vehicle } from "@/app/entities/vehicle.entity";
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { In, Not, Repository } from "typeorm";
 import { CreateServiceOrderDto, UpdateServiceOrderDto } from "./dto/service-order.dto";
 import { UsersService } from "../users/users.service";
 import { CreateServiceOrderDetailDto } from "./dto/service-order-detail.dto";
@@ -103,6 +103,29 @@ export class ServiceOrdersService {
         
         return orders;
     }
+
+    async findPending(): Promise<ServiceOrder[]> {
+        const orders = await this.serviceOrderRepository.find({
+            relations: ['history'],
+        });
+
+        const pendingOrders = orders.filter(order => {
+            const validStatus = order.history
+                .filter(history => !history.rollback)
+                .sort((a, b) => b.time.getTime() - a.time.getTime());
+                
+            const actualStatus = validStatus.length > 0 ? validStatus[0].status : null;
+            return actualStatus !== ServiceOrderStatus.ServiceOrdersFinished && 
+                actualStatus !== ServiceOrderStatus.ServiceOrdersCancelled;
+        });
+
+        if (!pendingOrders.length) {
+            throw new NotFoundException('No hay órdenes de servicio pendientes');
+        }
+
+        return pendingOrders;
+    }
+
     async create(data: CreateServiceOrderDto, user: User): Promise<ServiceOrder> {
         const { vehicleId, appointmentId, servicesIds, fileNumber, ...rest } = data;
 
