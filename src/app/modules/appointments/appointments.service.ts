@@ -280,9 +280,9 @@ export class AppointmentsService {
     }
 
     private validateAppointemt(appointment: Appointment) {
-        if (!this.isValidDay(appointment.date)) {
+        this.isValidDay(appointment.date)/* {
             throw new NotAcceptableException("El día seleccionado no es válido, las citas solo se pueden agendar de lunes a sábado");
-        }
+        }*/
 
         if (!this.inWorkingHours(appointment.time)) {
             throw new NotAcceptableException(
