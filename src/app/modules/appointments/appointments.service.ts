@@ -299,11 +299,7 @@ export class AppointmentsService {
         const dayOfWeek2 = date.toLocaleDateString("en-US", { weekday: "long" });
 
         console.log(dayOfWeek);
-        return {
-            dayOfWeek,
-            dayOfWeekUTC,
-            dayOfWeek2
-        }
+        throw new NotAcceptableException(`${dayOfWeek} - ${dayOfWeekUTC} - ${dayOfWeek2}`);
         //this.WORKNG_DAYS.includes(this.WORKNG_DAYS[dayOfWeek]);
     }
 
