@@ -333,7 +333,7 @@ export class AppointmentsService {
 
     private async isAvailableAppointment(date: Date, time: string): Promise<boolean> {
         const  formattedTime = `${time}:00`;
-        throw new NotAcceptableException(`${formattedTime} - ${date}`);
+        
         const appointments = await this.repository.find({
             where: { 
                 date, 

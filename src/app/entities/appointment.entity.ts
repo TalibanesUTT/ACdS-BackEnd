@@ -71,11 +71,4 @@ export class Appointment {
     @ManyToOne(() => User, (user) => user.appointments, { eager: true })
     @JoinColumn({ name: "customer_id" })
     customer: User;
-
-    @AfterLoad()
-    transformDate() {
-        if (this.date) {
-            this.date = new Date(this.date.toISOString().split("T")[0]);
-        }
-    }
 }

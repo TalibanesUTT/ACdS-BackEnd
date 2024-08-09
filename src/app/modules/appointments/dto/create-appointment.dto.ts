@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
+import { Transform } from "class-transformer";
 import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class CreateAppointmentDto {
@@ -18,7 +18,13 @@ export class CreateAppointmentDto {
         message: "El formato de la fecha es inválido, Utilizar el formato YYYY-MM-DD",
     })
     @IsNotEmpty({ message: "La fecha es obligatoria" })
-    @Type(() => Date)
+    @Transform(({ value }) => {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+            throw new Error("La fecha es inválida");
+        }
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    })
     date: Date;
 
     @ApiProperty({
