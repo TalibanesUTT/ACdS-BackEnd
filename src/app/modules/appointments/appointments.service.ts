@@ -17,14 +17,7 @@ import { format } from "date-fns";
 
 @Injectable()
 export class AppointmentsService {
-    private readonly WORKNG_DAYS = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
+    private readonly WORKNG_DAYS = [0, 1, 2, 3, 4, 5]; // Monday to Saturday
     private readonly WORKING_HOURS = {
         start: "09:00",
         end: "18:30",
@@ -280,9 +273,9 @@ export class AppointmentsService {
     }
 
     private validateAppointemt(appointment: Appointment) {
-        this.isValidDay(appointment.date)/* {
+        if (!this.isValidDay(appointment.date)) {
             throw new NotAcceptableException("El día seleccionado no es válido, las citas solo se pueden agendar de lunes a sábado");
-        }*/
+        }
 
         if (!this.inWorkingHours(appointment.time)) {
             throw new NotAcceptableException(
@@ -295,12 +288,7 @@ export class AppointmentsService {
 
     private isValidDay(date: Date) {
         const dayOfWeek = date.getDay();
-        const dayOfWeekUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).getDay();
-        const dayOfWeek2 = date.toLocaleDateString("en-US", { weekday: "long" });
-
-        console.log(dayOfWeek);
-        throw new NotAcceptableException(`${dayOfWeek} - ${dayOfWeekUTC} - ${dayOfWeek2}`);
-        //this.WORKNG_DAYS.includes(this.WORKNG_DAYS[dayOfWeek]);
+        return this.WORKNG_DAYS.includes(dayOfWeek);
     }
 
     private inWorkingHours(time: string): boolean {

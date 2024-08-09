@@ -67,7 +67,7 @@ export class ServiceOrdersController {
         }
     }
 
-    @Get("pendings/status")
+    @Get("status/pending")
     @HttpCode(200)
     @Roles(RoleEnum.MECHANIC)
     async getPendingServiceOrders(): Promise<ApiResponse<ServiceOrder[]>> {
