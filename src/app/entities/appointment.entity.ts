@@ -74,6 +74,8 @@ export class Appointment {
 
     @AfterLoad()
     transformDate() {
-        this.date = new Date(this.date);
+        if (this.date) {
+            this.date = new Date(this.date.toISOString().split("T")[0]);
+        }
     }
 }
