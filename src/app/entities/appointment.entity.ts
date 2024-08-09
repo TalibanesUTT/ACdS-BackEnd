@@ -14,10 +14,6 @@ import { Type } from "class-transformer";
 export const timeTransformer: ValueTransformer = {
     to(value: string): string {
         if (!value) return value;
-        // Ensure the value is in hh:mm format
-        if (!/^\d{2}:\d{2}$/.test(value)) {
-            throw new Error("Invalid time format. Expected hh:mm.");
-        }
         // Append ":00" to store as hh:mm:ss
         return value;
     },

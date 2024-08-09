@@ -29,7 +29,7 @@ export class CreateAppointmentDto {
     @IsString()
     @IsNotEmpty({ message: "La hora es obligatoria" })
     @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-        message: "El formato de la hora es inválido, Utilizar el formato HH:mm",
+        message: "El formato de la hora es inválido, utilizar el formato HH:mm",
     })
     time: string;
 

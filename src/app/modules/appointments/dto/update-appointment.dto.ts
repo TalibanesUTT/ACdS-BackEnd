@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsDate, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDate, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class UpdateAppointmentDto {
     @ApiPropertyOptional({
@@ -30,6 +30,9 @@ export class UpdateAppointmentDto {
     })
     @IsOptional()
     @IsString()
+    @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+        message: "El formato de la hora es inválido, utilizar el formato HH:mm",
+    })
     time?: string;
 
     @ApiPropertyOptional({
