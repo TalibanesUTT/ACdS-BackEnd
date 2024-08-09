@@ -293,10 +293,18 @@ export class AppointmentsService {
         this.validateAppointmentDate(appointment.date, appointment.time);
     }
 
-    private isValidDay(date: Date): boolean {
-        return this.WORKNG_DAYS.includes(
-            date.toLocaleDateString("en-US", { weekday: "long" }),
-        );
+    private isValidDay(date: Date) {
+        const dayOfWeek = date.getDay();
+        const dayOfWeekUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).getDay();
+        const dayOfWeek2 = date.toLocaleDateString("en-US", { weekday: "long" });
+
+        console.log(dayOfWeek);
+        return {
+            dayOfWeek,
+            dayOfWeekUTC,
+            dayOfWeek2
+        }
+        //this.WORKNG_DAYS.includes(this.WORKNG_DAYS[dayOfWeek]);
     }
 
     private inWorkingHours(time: string): boolean {
@@ -312,9 +320,8 @@ export class AppointmentsService {
 
     private validateAppointmentDate(date: Date, time: string): void {
         const currentDate = new Date();
-        const today = new Date(currentDate.setHours(0, 0, 0, 0));
-        const selectedDate = new Date(date);
-        const selectedDay = new Date(selectedDate.setHours(0, 0, 0, 0));
+        const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()); 
+        const selectedDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());  
 
         if (selectedDay < today) {
             throw new NotAcceptableException("No es posible programar una cita para una fecha anterior a la actual");
@@ -334,17 +341,18 @@ export class AppointmentsService {
             const currentTimePlusOneHour = new Date();
             currentTimePlusOneHour.setHours(currentDate.getHours() + 1, 0, 0, 0);
 
-            if (selectedDate < currentTimePlusOneHour) {
+            if (selectedDatetime < currentTimePlusOneHour) {
                 throw new NotAcceptableException("La hora de la cita debe ser al menos una hora mayor a la hora actual");
             }
         }
     }
 
     private async isAvailableAppointment(date: Date, time: string): Promise<boolean> {
+        const  formattedTime = `${time}:00`;
         const appointments = await this.repository.find({
             where: { 
                 date, 
-                time,
+                time: formattedTime,
                 status: AppointmentStatus.AppointmentsPending
             },
         });
@@ -353,12 +361,20 @@ export class AppointmentsService {
     }
 
     private async customerHasAppointmentsOnDate(user: User, date: Date): Promise<boolean> {
-        const appointments = await user.appointments;
-        console.log(appointments);
-        return appointments.some(appointment => 
-            appointment.status !== AppointmentStatus.AppointmentsCancelled &&
-            appointment.date.toDateString() === date.toDateString()
-        );
+        const startOfDay = new Date(date);
+        const endOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const appointments = await this.repository.find({
+            where: { 
+                customer: user,
+                date: Between(startOfDay, endOfDay),
+                status: AppointmentStatus.AppointmentsPending,  
+            },
+        });
+
+        return appointments.length > 0;
     }
 
     private isToday(date: Date) {
