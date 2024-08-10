@@ -37,14 +37,10 @@ export class CreateExpendituresTable1723188910785 implements MigrationInterface 
             })
         );
 
-        await queryRunner.createUniqueConstraint("Expenditures", new TableUnique({
-            name: "uq_expenditure",
-            columnNames: ["month", "year"],
-        }));
-
         await queryRunner.createIndex("Expenditures", new TableIndex({
             name: "idx_expenditure_month_year",
             columnNames: ["month", "year"],
+            isUnique: true,
         }));
     }
 
