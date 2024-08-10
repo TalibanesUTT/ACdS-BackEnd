@@ -5,6 +5,7 @@
         "user-management",
         "vehicles",
         "service-orders",
-        "appointments"
+        "appointments",
+        "expenditures"
     ]
 }
