@@ -39,8 +39,7 @@ export class Appointment {
     id: number;
 
     @Column({ type: "date" })
-    @Type(() => Date)
-    date: Date;
+    date: string;
 
     @Column({ 
         type: "time",

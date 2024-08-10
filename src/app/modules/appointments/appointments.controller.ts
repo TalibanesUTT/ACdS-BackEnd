@@ -7,12 +7,16 @@ import { User } from "src/app/entities/user.entity";
 import { ApiResponse } from "@/app/interfaces/api-response.interface";
 import { Appointment } from "@/app/entities/appointment.entity";
 import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
+import { TimezoneDatesService } from "@/app/services/timezone-dates/timezone-dates.service";
 
 @ApiTags("appointments")
 @Controller("appointments")
 @ApiBearerAuth()
 export class AppointmentsController {
-    constructor(private readonly service: AppointmentsService) {}
+    constructor(
+        private readonly service: AppointmentsService,
+        private readonly tmzDateService: TimezoneDatesService,
+    ) {}
 
     @Get()
     @HttpCode(200)
@@ -94,7 +98,7 @@ export class AppointmentsController {
     @ApiParam({ name: "userId", type: Number, description: "Id del cliente" })
     @Get("appointmentsDates/:userId")
     @HttpCode(200)
-    async getPendingAppointemntsByUser(@Param("userId", ParseIntPipe) userId: number): Promise<ApiResponse<Date[]>> {
+    async getPendingAppointemntsByUser(@Param("userId", ParseIntPipe) userId: number): Promise<ApiResponse<string[]>> {
         const dates = await this.service.getPendingAppointmentsByUser(userId);
         return {
             message: null,
@@ -107,7 +111,7 @@ export class AppointmentsController {
     @Get("unavailableHours/:date")
     @HttpCode(200)
     async getUnavailableHours(@Param("date") date: string): Promise<ApiResponse<string[]>> {
-        const hours = await this.service.getUnavailableHours(new Date(date));
+        const hours = await this.service.getUnavailableHours(date);
         return {
             message: null,
             data: hours,

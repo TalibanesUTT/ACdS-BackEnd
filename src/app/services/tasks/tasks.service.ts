@@ -1,8 +1,6 @@
 import { AppointmentsService } from "@/app/modules/appointments/appointments.service";
 import { Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
-import { MailerService } from "../mailer/mailer.service";
-import { MailConstants } from "@/constants/mail-constants";
 
 @Injectable()
 export class TasksService {

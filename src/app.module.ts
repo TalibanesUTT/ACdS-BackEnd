@@ -35,6 +35,7 @@ import { ServicesModule } from "./app/modules/services/services.module";
 import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { TasksModule } from "./app/services/tasks/tasks.module";
+import { TimezoneDatesModule } from "./app/services/timezone-dates/timezone-dates.module";
 
 @Module({
     imports: [
@@ -81,6 +82,7 @@ import { TasksModule } from "./app/services/tasks/tasks.module";
         ServicesModule,
         ServiceOrdersModule,
         TasksModule,
+        TimezoneDatesModule
     ],
     controllers: [AppController],
     providers: [

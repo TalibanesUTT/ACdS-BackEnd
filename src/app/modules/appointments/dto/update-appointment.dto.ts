@@ -1,5 +1,4 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { Type } from "class-transformer";
 import { IsDate, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class UpdateAppointmentDto {
@@ -19,9 +18,8 @@ export class UpdateAppointmentDto {
         format: "date",
     })
     @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    date?: Date;
+    @IsDate({ message: "El formato de la fecha es inválido, utilizar el formato YYYY-MM-DD" })
+    date?: string;
 
     @ApiPropertyOptional({
         description: "Hora de la cita (HH:mm)",
