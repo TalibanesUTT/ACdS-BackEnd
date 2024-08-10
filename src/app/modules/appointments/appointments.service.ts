@@ -140,8 +140,7 @@ export class AppointmentsService {
 
             const now = this.tmzDatesService.getCurrentDate();
             const appointmentDate = this.tmzDatesService.convertToDate(appointment.date);
-            console.log(now);
-            console.log(appointmentDate);
+
             if (appointmentDate < now) {
                 throw new NotAcceptableException("No puedes modificar una cita cuya fecha ya se venció");
             }
@@ -226,9 +225,6 @@ export class AppointmentsService {
         const now = this.tmzDatesService.getCurrentDate();
         const thresholdDate = this.tmzDatesService.subtractTimeToDate(now, 0, 0, 0, this.ONE_WEEK);
         const formattedThresholdDate = this.tmzDatesService.formatDateToString(thresholdDate);
-        console.log(now);
-        console.log(thresholdDate);
-        console.log(formattedThresholdDate);
 
         const appointments = await this.repository.find({
             where: { 
@@ -321,10 +317,6 @@ export class AppointmentsService {
         const selectedDate = this.tmzDatesService.convertToDate(date);
         const normalizedCurrentDate = this.tmzDatesService.formatDateToString(currentDate);
         const normalizedSelectedDate = this.tmzDatesService.formatDateToString(selectedDate);  
-        console.log(currentDate);
-        console.log(selectedDate);
-        console.log(normalizedCurrentDate);
-        console.log(normalizedSelectedDate);
 
         if (normalizedSelectedDate < normalizedCurrentDate) {
             throw new NotAcceptableException("No es posible programar una cita para una fecha anterior a la actual");
@@ -339,8 +331,6 @@ export class AppointmentsService {
             const [hours, minutes] = time.split(":").map(Number);
             const selectedDatetime = this.tmzDatesService.setTimeToDate(selectedDate, hours, minutes);
             const currentTimePlusOneHour = this.tmzDatesService.addRangeToDate(currentDate, 1, 0);
-            console.log(selectedDatetime);
-            console.log(currentTimePlusOneHour);
 
             if (selectedDatetime < currentTimePlusOneHour) {
                 throw new NotAcceptableException("La hora de la cita debe ser al menos una hora mayor a la hora actual");
@@ -377,8 +367,6 @@ export class AppointmentsService {
     private isToday(date: string): boolean {
         const today = this.tmzDatesService.getCurrentDate();
         const appointmentDate = this.tmzDatesService.convertToDate(date);
-        console.log(today);
-        console.log(appointmentDate);
 
         return this.tmzDatesService.isSameDay(today, appointmentDate);
     }
@@ -387,17 +375,12 @@ export class AppointmentsService {
         const times = [];
         let currentTime = this.tmzDatesService.createDateFromDatetime(`1970-01-01T${start}:00`);
         const endTime = this.tmzDatesService.createDateFromDatetime(`1970-01-01T${end}:00`);
-        console.log(currentTime);
-        console.log(endTime);
 
         while (currentTime <= endTime) {
             const time = this.tmzDatesService.getCurrentTimeString(currentTime);
-            console.log(time);
             times.push(time.substring(0, 5));
             const minutes = this.tmzDatesService.getMinutesFromDate(currentTime);
-            console.log(minutes);
             currentTime = this.tmzDatesService.addRangeToDate(currentTime, 0, minutes + interval);
-            console.log(currentTime);
         }
         return times;
     }
