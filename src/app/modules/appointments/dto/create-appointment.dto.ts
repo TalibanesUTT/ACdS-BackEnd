@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class CreateAppointmentDto {
     @ApiProperty({ description: "El id del usuario", example: 1, type: Number })
@@ -13,10 +13,10 @@ export class CreateAppointmentDto {
         type: String,
         format: "date",
     })
-    @IsDate({
+    @IsNotEmpty({ message: "La fecha es obligatoria" })
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, {
         message: "El formato de la fecha es inválido, utilizar el formato YYYY-MM-DD",
     })
-    @IsNotEmpty({ message: "La fecha es obligatoria" })
     date: string;
 
     @ApiProperty({
