@@ -302,8 +302,6 @@ export class AppointmentsService {
         const dateObj = this.tmzDatesService.convertToDate(date);
         const dayOfWeek = this.tmzDatesService.getDayOfWeek(dateObj);
 
-        console.log(dateObj);
-        console.log(dayOfWeek);
         return this.WORKNG_DAYS.includes(dayOfWeek);
     }
 
@@ -320,16 +318,19 @@ export class AppointmentsService {
 
     private validateAppointmentDate(date: string, time: string): void {
         const currentDate = this.tmzDatesService.getCurrentDate();
-        const selectedDate = this.tmzDatesService.convertToDate(date);  
-
+        const selectedDate = this.tmzDatesService.convertToDate(date);
+        const normalizedCurrentDate = this.tmzDatesService.formatDateToString(currentDate);
+        const normalizedSelectedDate = this.tmzDatesService.formatDateToString(selectedDate);  
         console.log(currentDate);
         console.log(selectedDate);
-        if (selectedDate < currentDate) {
+        console.log(normalizedCurrentDate);
+        console.log(normalizedSelectedDate);
+
+        if (normalizedSelectedDate < normalizedCurrentDate) {
             throw new NotAcceptableException("No es posible programar una cita para una fecha anterior a la actual");
         }
 
         const maxDate = this.tmzDatesService.addDaysToDate(currentDate, 60);
-        console.log(maxDate);
         if (selectedDate > maxDate) {
             throw new NotAcceptableException("No es posible programar una cita para una fecha mayor a 60 días a partir de la fecha actual");
         }  

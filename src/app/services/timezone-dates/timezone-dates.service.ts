@@ -21,6 +21,10 @@ export class TimezoneDatesService {
         return moment.tz(date, this.timezone).format("YYYY-MM-DD");
     }
 
+    normalizedToDateOnly(date: Date): Date {
+        return moment.tz(date, this.timezone).startOf("day").toDate();
+    }
+
     getCurrentDate(): Date {
         return moment.tz(this.timezone).toDate();
     }
