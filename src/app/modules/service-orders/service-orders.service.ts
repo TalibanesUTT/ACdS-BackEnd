@@ -211,20 +211,28 @@ export class ServiceOrdersService {
             order.notifyTo = notifyTo;
         }
 
-        if (appointmentId !== undefined && appointmentId !== null && (!order.appointment.id || appointmentId !== order.appointment.id)) { 
-            const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
-            if (!appointment) {
-                throw new NotFoundException('Cita no encontrada');
-            }
+        if (appointmentId !== undefined) { 
+            if (appointmentId === null) {
+                if (order.appointment) {
+                    order.appointment.status = AppointmentStatus.AppointmentsPending;
+                    await this.appointmentRepository.save(order.appointment);
+                    order.appointment = null;
+                }
+            } else {
+                const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
+                if (!appointment) {
+                    throw new NotFoundException('Cita no encontrada');
+                }
 
-            if (order.appointment) {
-                order.appointment.status = AppointmentStatus.AppointmentsPending;
-                await this.appointmentRepository.save(order.appointment);
-            }
+                if (order.appointment) {
+                    order.appointment.status = AppointmentStatus.AppointmentsPending;
+                    await this.appointmentRepository.save(order.appointment);
+                }
 
-            appointment.status = AppointmentStatus.AppointmentsCompleted;
-            await this.appointmentRepository.save(appointment);
-            order.appointment = appointment;
+                appointment.status = AppointmentStatus.AppointmentsCompleted;
+                await this.appointmentRepository.save(appointment);
+                order.appointment = appointment;
+            }
         }
 
         if (servicesIds !== undefined && servicesIds !== null) {
