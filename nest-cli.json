@@ -5,7 +5,8 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      "app/resources/templates/**/*.hbs"
+      "app/resources/templates/**/*.hbs",
+      "database/stored-procedures/**/*.sql"
     ],
     "watchAssets": true
   }

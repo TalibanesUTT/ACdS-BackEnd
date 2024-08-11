@@ -37,6 +37,8 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { TasksModule } from "./app/services/tasks/tasks.module";
 import { TimezoneDatesModule } from "./app/services/timezone-dates/timezone-dates.module";
 import { ExpendituresModule } from "./app/modules/expenditures/expenditures.module";
+import { DatabaseModule } from "./app/services/database/database.module";
+import { ReportsModule } from "./app/modules/reports/reports.module";
 
 @Module({
     imports: [
@@ -85,6 +87,8 @@ import { ExpendituresModule } from "./app/modules/expenditures/expenditures.modu
         TasksModule,
         TimezoneDatesModule,
         ExpendituresModule,
+        DatabaseModule,
+        ReportsModule,
     ],
     controllers: [AppController],
     providers: [

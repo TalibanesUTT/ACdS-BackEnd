@@ -6,6 +6,7 @@
         "vehicles",
         "service-orders",
         "appointments",
-        "expenditures"
+        "expenditures",
+        "reports"
     ]
 }
