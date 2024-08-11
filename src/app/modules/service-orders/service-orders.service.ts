@@ -18,6 +18,7 @@ import { ServiceOrderStatusFlow } from "./status-flow";
 import { format } from "date-fns";
 import { MailerService } from "@/app/services/mailer/mailer.service";
 import { MailConstants } from "@/constants/mail-constants";
+import { TimezoneDatesService } from "@/app/services/timezone-dates/timezone-dates.service";
 
 @Injectable()
 export class ServiceOrdersService {
@@ -35,7 +36,8 @@ export class ServiceOrdersService {
         @InjectRepository(HistoryServerOrder)
         private readonly historyRepository: Repository<HistoryServerOrder>,
         private readonly userService: UsersService,
-        private readonly mailerService: MailerService
+        private readonly mailerService: MailerService,
+        private readonly tmzDateService: TimezoneDatesService
     ) {}
 
     async findAll(limit = 100): Promise<ServiceOrder[]> {
@@ -260,18 +262,30 @@ export class ServiceOrdersService {
 
         const { departureDate, ...rest } = data;
 
-        if (departureDate && new Date(departureDate).getTime() < new Date(serviceOrder.createDate).getTime()) {
-            throw new BadRequestException('La fecha de salida no puede ser anterior a la fecha de creación de la orden de servicio');
+        let millisDepartureDate = null, millisCreateDate = null;
+        if (departureDate) {
+            const currentDate = this.tmzDateService.getCurrentDate();
+            const millisCurrentDate = this.tmzDateService.getMilliscendsSinceEpoch(currentDate);
+            millisDepartureDate = this.tmzDateService.getMilliscendsSinceEpoch(departureDate);
+            millisCreateDate = this.tmzDateService.getMilliscendsSinceEpoch(serviceOrder.createDate);
+
+            if (millisDepartureDate < millisCreateDate) {
+                throw new BadRequestException('La fecha de salida no puede ser anterior a la fecha de creación de la orden de servicio');
+            }
+
+            if (millisDepartureDate > millisCurrentDate) {
+                throw new BadRequestException('La fecha de salida no puede ser posterior a la fecha actual');
+            }
         }
 
         const repairDays = departureDate ? 
-            Math.ceil((new Date(departureDate).getTime() - new Date(serviceOrder.createDate).getTime()) / (1000 * 60 * 60 * 24)) : 
+            Math.ceil((millisDepartureDate - millisCreateDate) / (1000 * 60 * 60 * 24)) :
             (serviceOrder.detail && serviceOrder.detail.departureDate ? serviceOrder.detail.repairDays : null);
 
         let detail = null;
         const detailData = {
             ...rest,
-            departureDate: departureDate ? new Date(departureDate) : (serviceOrder.detail ? serviceOrder.detail.departureDate : null),
+            departureDate: departureDate ? departureDate : (serviceOrder.detail ? serviceOrder.detail.departureDate : null),
             repairDays,
             serviceOrder
         };

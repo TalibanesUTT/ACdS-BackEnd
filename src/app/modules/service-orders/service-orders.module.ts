@@ -10,11 +10,13 @@ import { UsersModule } from "../users/users.module";
 import { ServiceOrderDetail } from "@/app/entities/service-order-detail.entity";
 import { HistoryServerOrder } from "@/app/entities/history-server-order.entity";
 import { MailerModule } from "@/app/services/mailer/mailer.module";
+import { TimezoneDatesModule } from "@/app/services/timezone-dates/timezone-dates.module";
 
 @Module({
     imports: [
         UsersModule,
         MailerModule,
+        TimezoneDatesModule,
         TypeOrmModule.forFeature([ServiceOrder, Vehicle, Appointment, Service, ServiceOrderDetail, HistoryServerOrder])
     ],
     controllers: [ServiceOrdersController],

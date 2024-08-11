@@ -5,6 +5,7 @@ export interface ExpenditureData {
     water?: number;
     electricity?: number;
     radios?: number;
+    telephones?: number;
     pettyCash?: number;
     vacation?: number;
     insurancePolicies?: number;

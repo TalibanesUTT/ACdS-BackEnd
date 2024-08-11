@@ -10,6 +10,7 @@ export function validateAndTransformData(data: any): ExpenditureData {
         water: typeof data.water === "number" && !isNaN(data.water) ? parseFloat(data.water.toFixed(2)) : defaultNumber,
         electricity: typeof data.electricity === "number" && !isNaN(data.electricity) ? parseFloat(data.electricity.toFixed(2)) : defaultNumber,
         radios: typeof data.radios === "number" && !isNaN(data.radios) ? parseFloat(data.radios.toFixed(2)) : defaultNumber,
+        telephones: typeof data.telephones === "number" && !isNaN(data.telephones) ? parseFloat(data.telephones.toFixed(2)) : defaultNumber,
         pettyCash: typeof data.pettyCash === "number" && !isNaN(data.pettyCash) ? parseFloat(data.pettyCash.toFixed(2)) : defaultNumber,
         vacation: typeof data.vacation === "number" && !isNaN(data.vacation) ? parseFloat(data.vacation.toFixed(2)) : defaultNumber,
         insurancePolicies: typeof data.insurancePolicies === "number" && !isNaN(data.insurancePolicies) ? parseFloat(data.insurancePolicies.toFixed(2)) : defaultNumber,

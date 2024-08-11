@@ -13,7 +13,7 @@ import { StatusDto } from "./dto/status.dto";
 
 @Controller("service-orders")
 @ApiTags("service-orders")
-@ApiBearerAuth()
+//@ApiBearerAuth()
 export class ServiceOrdersController {
     constructor(
         private readonly serviceOrdersService: ServiceOrdersService
@@ -112,7 +112,7 @@ export class ServiceOrdersController {
 
     @Post("addDetail/:id")
     @HttpCode(201)
-    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
+    //@Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
     @ApiParam({ name: "id", type: "number", description: "The id of the service order" })
     async addServiceOrderDetail(
         @Param("id", ParseIntPipe) id: number,

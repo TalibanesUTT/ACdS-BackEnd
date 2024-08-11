@@ -41,6 +41,18 @@ export class TimezoneDatesService {
         return moment.tz(date, this.timezone).minutes();
     }
 
+    getYear(date: Date): number {
+        return moment.tz(date, this.timezone).year();
+    }
+
+    getMonth(date: Date): number {
+        return moment.tz(date, this.timezone).month() + 1;
+    }
+
+    getMilliscendsSinceEpoch(date: Date): number {
+        return moment.tz(date, this.timezone).valueOf();
+    }
+
     addDaysToDate(date: Date, days: number): Date {
         return moment.tz(date, this.timezone).add(days, "days").toDate();
     }

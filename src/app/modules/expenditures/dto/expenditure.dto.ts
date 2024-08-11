@@ -33,6 +33,11 @@ export class ExpenditureDataDto {
     @IsNumber()
     radios?: number;
 
+    @ApiProperty({ description: "The amount of money spent on telephones", example: 400.50 })
+    @IsOptional()
+    @IsNumber()
+    telephones?: number;
+
     @ApiProperty({ description: "The amount of money spent on petty cash", example: 400.50 })
     @IsOptional()
     @IsNumber()

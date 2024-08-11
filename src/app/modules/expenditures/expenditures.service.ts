@@ -4,12 +4,14 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { validateAndTransformData } from "./transform-expenditure-data";
+import { TimezoneDatesService } from "@/app/services/timezone-dates/timezone-dates.service";
 
 @Injectable()
 export class ExpendituresService {
     constructor(
         @InjectRepository(Expenditure)
-        private readonly expenditureRepository: Repository<Expenditure>
+        private readonly expenditureRepository: Repository<Expenditure>,
+        private readonly tmzDateService: TimezoneDatesService
     ) {}
 
     async findOne(year: number, month: number): Promise<Expenditure> {
@@ -34,6 +36,14 @@ export class ExpendituresService {
         const { month, year } = dto;
         if (month < 1 || month > 12 || year < 2020) {
             throw new BadRequestException('Mes o año inválido');
+        }
+
+        const currentDate = this.tmzDateService.getCurrentDate();
+        const currentYear = this.tmzDateService.getYear(currentDate);
+        const currentMonth = this.tmzDateService.getMonth(currentDate);
+
+        if (year > currentYear || (year === currentYear && month > currentMonth)) {
+            throw new BadRequestException('No es posible ingresar egresos para meses futuros');
         }
 
         const validatedData: ExpenditureData = validateAndTransformData(dto.data);
