@@ -211,7 +211,7 @@ export class ServiceOrdersService {
             order.notifyTo = notifyTo;
         }
 
-        if (appointmentId !== undefined && appointmentId !== null && appointmentId !== order.appointment.id) { 
+        if (appointmentId !== undefined && appointmentId !== null && (!order.appointment.id || appointmentId !== order.appointment.id)) { 
             const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
             if (!appointment) {
                 throw new NotFoundException('Cita no encontrada');
@@ -224,6 +224,7 @@ export class ServiceOrdersService {
 
             appointment.status = AppointmentStatus.AppointmentsCompleted;
             await this.appointmentRepository.save(appointment);
+            order.appointment = appointment;
         }
 
         if (servicesIds !== undefined && servicesIds !== null) {
