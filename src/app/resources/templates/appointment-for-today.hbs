@@ -30,15 +30,8 @@
                 <td class="column1">
                         <h1>¡Hola {{ name }}!</h1>
                         <p>
-                            {{#if fromAdmin}}
-                                Un administrador ha solicitado reestablecer tu contraseña,
-                            {{else}}
-                                Hemos recibido tu solicitud para recuperar tu contraseña,
-                            {{/if}}
-                            por lo que te hemos enviado este correo. <br><br> Tu nueva contraseña es: <br><br> 
-                            <strong style="font-size: 40px; color: #">{{ password }}</strong><br><br> 
-                            Por favor, conservala e introdúcela en la aplicación para iniciar sesión. 
-                            De ser posible, cambiala una vez hayas ingresado por una de tu preferencia.
+                            Enviamos este correo para recordarte que tienes una cita programada para el día de hoy,
+                            <strong>{{ date }}</strong> a las <strong>{{ time }}</strong>. ¡No lo olvides!<br>
                         </p>
                 </td>
             </tr>

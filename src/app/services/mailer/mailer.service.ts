@@ -11,16 +11,27 @@ export class MailerService {
         private readonly mailerService: NestMailerService, 
     ) {}
 
-    async sendMail(to: string, subject: string, template: string, context: any) {
-        await this.mailerService.sendMail({
-            to,
-            subject,
-            template,
-            context,
-        })
+    async sendMail(to: string | string[], subject: string, template: string, context: any) {
+        if (Array.isArray(to)) {
+            to.forEach(async (email) => {
+                await this.mailerService.sendMail({
+                    to: email,
+                    subject,
+                    template,
+                    context,
+                });
+            });
+        } else {
+            await this.mailerService.sendMail({
+                to,
+                subject,
+                template,
+                context,
+            });
+        }
     }
 
-    async addMailJob(to: string, subject: string, template: string, context: any, delay: number = 0) {
+    async addMailJob(to: string | string[], subject: string, template: string, context: any, delay: number = 0) {
         await this.mailQueue.add(
             "send-mail", 
             { to, subject, template, context },

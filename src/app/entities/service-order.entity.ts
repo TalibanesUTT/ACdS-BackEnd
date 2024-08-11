@@ -43,6 +43,14 @@ export class ServiceOrder {
     })
     createDate: Date;
 
+    @Column({
+        type: 'nvarchar',
+        length: 100,
+        nullable: true,
+        name: 'notify_to'
+    })
+    notifyTo?: string;
+
     @ManyToOne(() => Vehicle, (vehicle) => vehicle.serviceOrders, {
         eager: true
     })

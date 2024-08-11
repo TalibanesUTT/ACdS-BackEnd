@@ -11,10 +11,13 @@ import { CreateServiceOrderDetailDto } from "./dto/service-order-detail.dto";
 import { ServiceOrderDetail } from "@/app/entities/service-order-detail.entity";
 import { User } from "@/app/entities/user.entity";
 import { HistoryServerOrder } from "@/app/entities/history-server-order.entity";
-import { ServiceOrderStatus } from "@/constants/values-constants";
+import { AppointmentStatus, ServiceOrderStatus } from "@/constants/values-constants";
 import { TextConstants } from "@/constants/text-constants";
 import { StatusDto } from "./dto/status.dto";
 import { ServiceOrderStatusFlow } from "./status-flow";
+import { format } from "date-fns";
+import { MailerService } from "@/app/services/mailer/mailer.service";
+import { MailConstants } from "@/constants/mail-constants";
 
 @Injectable()
 export class ServiceOrdersService {
@@ -31,7 +34,8 @@ export class ServiceOrdersService {
         private readonly detailRepository: Repository<ServiceOrderDetail>,
         @InjectRepository(HistoryServerOrder)
         private readonly historyRepository: Repository<HistoryServerOrder>,
-        private readonly userService: UsersService
+        private readonly userService: UsersService,
+        private readonly mailerService: MailerService
     ) {}
 
     async findAll(limit = 100): Promise<ServiceOrder[]> {
@@ -84,8 +88,50 @@ export class ServiceOrdersService {
         return orders;
     }
 
+    async findByVehicle(vehicleId: number): Promise<ServiceOrder[]> {
+        const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
+
+        if (!vehicle) {
+            throw new NotFoundException('Vehículo no encontrado');
+        }
+
+        const orders = await this.serviceOrderRepository.find({
+            where: {
+                vehicle: { id: vehicle.id }
+            }
+        })
+
+        if (!orders.length) {
+            throw new NotFoundException('No hay órdenes de servicio registradas para este vehículo');
+        }
+        
+        return orders;
+    }
+
+    async findPending(): Promise<ServiceOrder[]> {
+        const orders = await this.serviceOrderRepository.find({
+            relations: ['history'],
+        });
+
+        const pendingOrders = orders.filter(order => {
+            const validStatus = order.history
+                .filter(history => !history.rollback)
+                .sort((a, b) => b.time.getTime() - a.time.getTime());
+                
+            const actualStatus = validStatus.length > 0 ? validStatus[0].status : null;
+            return actualStatus !== ServiceOrderStatus.ServiceOrdersFinished && 
+                actualStatus !== ServiceOrderStatus.ServiceOrdersCancelled;
+        });
+
+        if (!pendingOrders.length) {
+            throw new NotFoundException('No hay órdenes de servicio pendientes');
+        }
+
+        return pendingOrders;
+    }
+
     async create(data: CreateServiceOrderDto, user: User): Promise<ServiceOrder> {
-        const { vehicleId, appointmentId, servicesIds, fileNumber, ...rest } = data;
+        const { vehicleId, appointmentId, servicesIds, fileNumber, notifyTo, ...rest } = data;
 
         const existingFileNumber = !!(await this.serviceOrderRepository.findOneBy({ fileNumber }));
         if (existingFileNumber) {
@@ -98,11 +144,18 @@ export class ServiceOrdersService {
             if (!appointment) {
                 throw new NotFoundException('Cita no encontrada');
             }
+
+            appointment.status = AppointmentStatus.AppointmentsCompleted;
+            await this.appointmentRepository.save(appointment);
         }
 
         const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
         if (!vehicle) {
             throw new NotFoundException('Vehículo no encontrado');
+        }
+
+        if (notifyTo && vehicle.owner.email === notifyTo) {
+            throw new BadRequestException('No se puede seleccionar el mismo correo electrónico del propietario del vehículo para enviar notificaciones');
         }
 
         const services = servicesIds ? await this.serviceRepository.findBy({ id: In(servicesIds) }) : [];
@@ -112,7 +165,8 @@ export class ServiceOrdersService {
             vehicle,
             appointment,
             services,
-            fileNumber
+            fileNumber,
+            notifyTo
         });
 
         await this.serviceOrderRepository.save(serviceOrder);
@@ -133,16 +187,17 @@ export class ServiceOrdersService {
             throw new NotFoundException('Orden de servicio no encontrada');
         }
 
-        const { vehicleId, appointmentId, servicesIds, fileNumber, ...rest } = data;
+        const { vehicleId, appointmentId, servicesIds, fileNumber, notifyTo, ...rest } = data;
 
         if (fileNumber && fileNumber !== order.fileNumber) {
             const existingFileNumber = !!(await this.serviceOrderRepository.findOneBy({ fileNumber }));
             if (existingFileNumber) {
                 throw new BadRequestException('El número de expediente ya se encuentra en uso');
             }
+            order.fileNumber = fileNumber;
         }
 
-        if (vehicleId) {
+        if (vehicleId && vehicleId !== order.vehicle.id) {
             const vehicle = await this.vehicleRepository.findOneBy({ id: vehicleId });
             if (!vehicle) {
                 throw new NotFoundException('Vehículo no encontrado');
@@ -150,12 +205,34 @@ export class ServiceOrdersService {
             order.vehicle = vehicle;
         }
 
-        if (appointmentId !== undefined && appointmentId !== null) { 
-            const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
-            if (!appointment) {
-                throw new NotFoundException('Cita no encontrada');
+        if (notifyTo && order.vehicle.owner.email === notifyTo) {
+            throw new BadRequestException('No se puede seleccionar el mismo correo electrónico del propietario del vehículo para enviar notificaciones');
+        } else {
+            order.notifyTo = notifyTo;
+        }
+
+        if (appointmentId !== undefined) { 
+            if (appointmentId === null) {
+                if (order.appointment) {
+                    order.appointment.status = AppointmentStatus.AppointmentsPending;
+                    await this.appointmentRepository.save(order.appointment);
+                    order.appointment = null;
+                }
+            } else {
+                const appointment = await this.appointmentRepository.findOneBy({ id: appointmentId });
+                if (!appointment) {
+                    throw new NotFoundException('Cita no encontrada');
+                }
+
+                if (order.appointment) {
+                    order.appointment.status = AppointmentStatus.AppointmentsPending;
+                    await this.appointmentRepository.save(order.appointment);
+                }
+
+                appointment.status = AppointmentStatus.AppointmentsCompleted;
+                await this.appointmentRepository.save(appointment);
+                order.appointment = appointment;
             }
-            order.appointment = appointment;
         }
 
         if (servicesIds !== undefined && servicesIds !== null) {
@@ -215,7 +292,7 @@ export class ServiceOrdersService {
     async updateStatus(orderId: number, user: User, data: StatusDto): Promise<ServiceOrder> {
         const order = await this.serviceOrderRepository.findOne({
             where: { id: orderId },
-            relations: ['history']
+            relations: ['history', 'vehicle', 'vehicle.owner']
         })
         if (!order) {
             throw new NotFoundException('Orden de servicio no encontrada');
@@ -292,10 +369,12 @@ export class ServiceOrdersService {
             lastHistoryEntry.rollback = true;
             await this.historyRepository.save(lastHistoryEntry);
             
-            const updatedOrder = this.serviceOrderRepository.findOne({
+            const updatedOrder = await this.serviceOrderRepository.findOne({
                 where: { id: orderId },
                 relations: ['history']
             })
+
+            this.sendStatusNotification(updatedOrder, updatedOrder.actualStatus, '', '', '', true);
             return updatedOrder;
         } else {
             if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServiceOrdersFinished) { 
@@ -340,14 +419,44 @@ export class ServiceOrdersService {
             })
 
             await this.historyRepository.save(newHistoryEntry);
-            const updatedOrder = this.serviceOrderRepository.findOne({
+            const updatedOrder = await this.serviceOrderRepository.findOne({
                 where: { id: orderId },
                 relations: ['history']
             })
+
+            const formattedDate = format(newHistoryEntry.time, 'dd/MM/yyyy');
+            const formattedTime = format(newHistoryEntry.time, 'HH:mm');
+            const comments = data.comments ? data.comments : '';
+            this.sendStatusNotification(updatedOrder, newStatus, formattedDate, formattedTime, comments, false);
 
             return updatedOrder;
         }
 
         return order;
+    }
+
+    private async sendStatusNotification(
+        order: ServiceOrder, status: ServiceOrderStatus, formattedDate: string, formattedTime: string, comments: string, rollback: boolean = false
+    ) {
+        const emails = [order.vehicle.owner.email];
+        if (order.notifyTo) {
+            emails.push(order.notifyTo);
+        }
+        const vehicle = `${order.vehicle.model.brand.name} ${order.vehicle.model.model} ${order.vehicle.year} ${order.vehicle.color}`;
+
+        await this.mailerService.addMailJob(
+            emails,
+            MailConstants.SubjectServiceOrderStatusChangedMail,
+            "service-order-status-changed",
+            {
+                name: order.vehicle.owner.name,
+                vehicle: vehicle,
+                status: status,
+                date: formattedDate,
+                time: formattedTime,
+                comments: comments,
+                rollback: rollback
+            }
+        )
     }
 }

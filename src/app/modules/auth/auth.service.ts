@@ -194,9 +194,9 @@ export class AuthService {
         const verificationCode = this.randomCodeService.generateRandomCode(6);
         user.verificationCode = await bcrypt.hash(verificationCode, 10);
 
-        const text =
-            TextConstants.TextVerificationCodeMessage + verificationCode;
-        await this.vonageService.addSmsJob(user.phoneNumber, text, 12000);
+        const text = TextConstants.TextVerificationCodeMessage + verificationCode;
+        const encodedText = Buffer.from(text, "utf-8").toString();
+        await this.vonageService.addSmsJob(user.phoneNumber, encodedText, 12000);
         await this.userRepository.save(user);
     }
 

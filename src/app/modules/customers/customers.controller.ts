@@ -18,7 +18,7 @@ export class CustomersController {
 
     @Get()
     @HttpCode(200)
-    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
+    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT, RoleEnum.MECHANIC)
     async getCustomers(): Promise<ApiResponse<User[]>> {
         const customers = await this.service.findAll();
         return {

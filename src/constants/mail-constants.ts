@@ -6,6 +6,8 @@ export class MailConstants {
     static readonly SubjectAccountActivatedMail = "Tu cuenta ha sido activada";
     static readonly SubjectAccountDeactivatedMail = "Tu cuenta ha sido desactivada";
     static readonly SubjectRoleChangedMail = "Tu rol ha cambiado";
+    static readonly SubjectAppointmentForTodayMail = "Tienes una cita programada para hoy"; 
+    static readonly SubjectServiceOrderStatusChangedMail = "El estado de tu orden de servicio se ha actualizado";
 
     static readonly EndpointVerifyEmail = "verify-email";
     static readonly EndpointVerifyPhone = "verify-phone";

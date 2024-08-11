@@ -33,6 +33,12 @@ import { CarModelsModule } from "./app/modules/car-models/car-models.module";
 import { AppointmentsModule } from './app/modules/appointments/appointments.module';
 import { ServicesModule } from "./app/modules/services/services.module";
 import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders.module";
+import { ScheduleModule } from "@nestjs/schedule";
+import { TasksModule } from "./app/services/tasks/tasks.module";
+import { TimezoneDatesModule } from "./app/services/timezone-dates/timezone-dates.module";
+import { ExpendituresModule } from "./app/modules/expenditures/expenditures.module";
+import { DatabaseModule } from "./app/services/database/database.module";
+import { ReportsModule } from "./app/modules/reports/reports.module";
 
 @Module({
     imports: [
@@ -61,6 +67,7 @@ import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders
             }),
         }),
 
+        ScheduleModule.forRoot(),
         SignedUrlModule,
         MailerModule,
         RandomCodeModule,
@@ -77,6 +84,11 @@ import { ServiceOrdersModule } from "./app/modules/service-orders/service-orders
         AppointmentsModule,
         ServicesModule,
         ServiceOrdersModule,
+        TasksModule,
+        TimezoneDatesModule,
+        ExpendituresModule,
+        DatabaseModule,
+        ReportsModule,
     ],
     controllers: [AppController],
     providers: [

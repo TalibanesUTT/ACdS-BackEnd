@@ -13,6 +13,7 @@ import { Role } from "./role.entity";
 import { Exclude, Transform } from "class-transformer";
 import { Vehicle } from "./vehicle.entity";
 import { Appointment } from "./appointment.entity";
+import { AppointmentStatus } from "@/constants/values-constants";
 
 @Entity({
     name: "Users",
@@ -134,14 +135,5 @@ export class User {
         if (!isHashed) {
             this.password = await bcrypt.hash(this.password, 10);
         }
-    }
-    
-    async hasAppointmentsOnDate(date: Date): Promise<boolean> { 
-        const appointments = await this.appointments;
-        return appointments.some(
-            (appointment) =>
-                appointment.date.toDateString() ===
-                new Date(date).toDateString(),
-        );
     }
 }

@@ -1,9 +1,16 @@
-import { AppointmentStatus } from "@/constants/values-constants";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class UpdateAppointmentDto {
+    @ApiPropertyOptional({
+        description: "El id del usuario",
+        example: 1,
+        type: Number,
+    })
+    @IsOptional()
+    @IsNumber()
+    userId?: number;
+
     @ApiPropertyOptional({
         description: "Fecha de la cita (YYYY-MM-DD)",
         example: "2024-08-01",
@@ -11,9 +18,10 @@ export class UpdateAppointmentDto {
         format: "date",
     })
     @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    date: Date;
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+        message: "El formato de la fecha es inválido, utilizar el formato YYYY-MM-DD",
+    })
+    date?: string;
 
     @ApiPropertyOptional({
         description: "Hora de la cita (HH:mm)",
@@ -22,7 +30,10 @@ export class UpdateAppointmentDto {
     })
     @IsOptional()
     @IsString()
-    time: string;
+    @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+        message: "El formato de la hora es inválido, utilizar el formato HH:mm",
+    })
+    time?: string;
 
     @ApiPropertyOptional({
         description: "Razón de la cita",
@@ -31,14 +42,5 @@ export class UpdateAppointmentDto {
     })
     @IsOptional()
     @IsString()
-    reason: string;
-
-    @ApiPropertyOptional({
-        description: "Estado de la cita",
-        example: AppointmentStatus.AppointmentsCompleted,
-        enum: AppointmentStatus,
-    })
-    @IsOptional()
-    @IsEnum(AppointmentStatus)
-    status: AppointmentStatus;
+    reason?: string;
 }

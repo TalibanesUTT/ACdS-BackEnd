@@ -55,6 +55,13 @@ export class CreateServiceOrderTable1718408240994
                         isNullable: false,
                     }),
                     new TableColumn({
+                        name: "notify_to",
+                        type: "nvarchar",
+                        length: "100",
+                        isNullable: true,
+                    }),
+
+                    new TableColumn({
                         name: "create_date",
                         type: "timestamp",
                         isNullable: false,

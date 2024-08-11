@@ -4,6 +4,9 @@
         "deploy",
         "user-management",
         "vehicles",
-        "service-orders"
+        "service-orders",
+        "appointments",
+        "expenditures",
+        "reports"
     ]
 }

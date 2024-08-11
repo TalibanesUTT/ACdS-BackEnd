@@ -1,0 +1,160 @@
+<html>
+<head>
+    <style>
+        body { width: 100% !important; margin: 0; padding: 0;
+        -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; } table
+        { border-spacing: 0; border-collapse: collapse; table-layout: fixed;
+        Margin: 0 auto; } img { border: 0; -ms-interpolation-mode: bicubic;
+        } a { text-decoration: none; } a[x-apple-data-detectors] { color:
+        inherit !important; text-decoration: none !important; }
+        .email-container { width: 100%; max-width: 600px; margin: auto;
+        border: 1px solid #e0e0e0; } .column1 { background-color: #f2494e;
+        text-align: center; padding: 40px 20px; } .column2 { padding: 20px;
+        text-align: center; } h1 { color: white; font-size: 24px;
+        font-family: Arial, sans-serif; } p { color: white; font-size: 16px;
+        font-family: Arial, sans-serif; line-height: 1.4; } .button {
+        display: inline-block; background-color: #bc0505; color: white;
+        text-align: center; font-size: 18px; padding: 15px 30px;
+        border-radius: 100px; border: none; } .button:hover {
+        background-color: #f2494e; cursor: pointer; } footer { text-align:
+        center; margin-top: 20px; } footer p { color: black; font-size:
+        medium; margin: 5px 0; } @media screen and (max-width: 600px) { h1 {
+        font-size: 20px; } p { font-size: 14px; } .button { font-size: 16px;
+        padding: 10px 20px; } }
+    </style>
+</head>
+<body>
+    <center>
+        <table role="presentation" class="email-container">
+            <tr>
+                <td class="column1">
+                        <h1>¡Hola {{ name }}!</h1>
+                        <p>
+                            Enviamos este correo para notificarte que la orden de servicio para tu vehículo
+                            <strong>{{ vehicle }}</strong>
+                            {{#if rollback}}
+                                ha sido regresada a su estatus anterior, <strong>{{ status }}</strong>. 
+                                Esto suele suceder cuando se detecta un error o se requiere una corrección
+                                en el proceso de trabajo.
+                            {{else}}
+                                se ha movido al estatus <strong>{{ status }}</strong>
+                                el día <strong>{{ date }}</strong> a las <strong>{{ time }}</strong>.
+                            {{/if}}
+                            <br><br>
+                            {{#switch status}}
+                                {{#case "En revisión"}}
+                                    <p>
+                                        Esto significa que uno de nuestros mecánicos se encuentra revisando e 
+                                        inspeccionando las problemáticas, condiciones y necesidades de tu vehículo
+                                        para poder emitir un diagnóstico.
+                                    </p>
+                                {{/case}}
+                                {{#case "Emitido"}}
+                                    <p>
+                                        Esto significa que la inspección inicial de tu vehículo ha sido completada y
+                                        se ha emitido un diagnóstico y presupuesto contemplando las necesidades y 
+                                        problemáticas identificadas. Puedes revisar los detalles tanto del diagnóstico
+                                        como del presupuesto desde nuestra <a href="https://appdevweb.online/home">
+                                        aplicación</a>.
+                                    </p>
+                                {{/case}}
+                                {{#case "Aprobado"}}
+                                    <p>
+                                        Esto significa que el diagnóstico y presupuesto emitido han sido aprobados 
+                                        tanto por ti como por nuestro equipo. Esto da luz verde para que nuestro equipo
+                                        de mecánicos comience a trabajar en los detalles y mantenimiento de tu vehículo. 
+                                    </p>
+                                {{/case}}
+                                {{#case "En proceso"}}
+                                    <p>
+                                        Esto significa que nuestro equipo de mecánicos ha comenzado a trabajar en
+                                        los detalles y mantenimiento de tu vehículo. Este proceso puede tomar tiempo
+                                        dependiendo de la complejidad de las necesidades identificadas, agradecemos
+                                        tu paciencia.
+                                    </p>
+                                {{/case}}
+                                {{#case "En chequeo"}}
+                                    <p>
+                                        Esto significa que el trabajo realizado en tu vehículo casi ha sido completado
+                                        y en este momento se están realizando las pruebas y chequeos pertinentes para 
+                                        asegurarnos de que tu vehículo se encuentra en óptimas condiciones y las 
+                                        reparaciones se han realizado de manera correcta.
+                                    </p>
+                                {{/case}}
+                                {{#case "Completado"}}
+                                    <p>
+                                        Esto significa que la inspección final de tu vehículo ha sido completada y
+                                        los resultados fueron satisfactorios. La orden de servicio se completó y tu 
+                                        vehículo ya casi está listo para que puedas recogerlo.
+                                    </p>
+                                {{/case}}
+                                {{#case "Listo para recoger"}}
+                                    <p>
+                                        Esto significa que el trabajo realizado en tu vehículo ha sido concluido de 
+                                        forma satisfactoria y este ya se encuentra listo para que puedas pasar a 
+                                        recogerlo. Agradecemos tu paciencia y confianza en nosotros. Te esperamos
+                                        en nuestro taller.
+                                    </p>
+                                {{/case}}
+                                {{#case "Entregado"}}
+                                    <p>
+                                        Esto significa que ya has recogido tu vehículo y en este momento ya se encuentra
+                                        en tu posesión. ¡Muchas gracias por tu preferencia! Esperamos verte de nuevo 
+                                        cuando necesites de nuestros servicios.
+                                    </p>
+                                {{/case}}
+                                {{#case "Finalizado"}}
+                                    <p>
+                                        Esto significa que la orden de servicio para tu vehículo ha sido marcada como 
+                                        finalizada y cerrada. A partir de ahora, dejarás de recibir actualizaciones 
+                                        sobre ella. Si tienes alguna duda o pregunta acerca de tu orden de servicio, 
+                                        no dudes en contactarnos.
+                                    </p>
+                                {{/case}}
+                                {{#case "En espera"}}
+                                    <p>
+                                        Esto significa que se ha detenido el proceso de trabajo en tu vehículo y se 
+                                        encuentra en espera por la siguiente razón: <strong>{{ comments }}</strong>. 
+                                        Se espera que pueda reanudarse lo más pronto posible, luego de resolver la 
+                                        situación. Si tienes alguna duda o pregunta, por favor contáctanos.
+                                    </p>
+                                {{/case}}
+                                {{#case "Cancelado"}}
+                                    <p>
+                                        Esto significa que la orden de servicio para tu vehículo ha sido cancelada
+                                        por la siguiente razón: <strong>{{ comments }}</strong>. Ya no se continuará
+                                        con el proceso de trabajo en tu vehículo, por lo que puedes pasar a recogerlo 
+                                        en cualquier momento. Si piensas que esto es un error y deseas continuar con el 
+                                        proceso, por favor contáctanos.
+                                    </p>
+                                {{/case}}
+                                {{#case "Recibido"}}
+                                    <p>
+                                        Este es el estatus inicial de la orden de servicio para tu vehículo.
+                                        Actualmente hemos recibido tu vehículo y se encuentra en espera para
+                                        ser revisado e inspeccionado por uno de nuestros mecánicos. 
+                                    </p>
+                                {{/case}}
+                                {{#default}}
+                                    <p>
+                                        Este es el estatus inicial de la orden de servicio para tu vehículo.
+                                        Actualmente hemos recibido tu vehículo y se encuentra en espera para
+                                        ser revisado e inspeccionado por uno de nuestros mecánicos. 
+                                    </p>
+                                {{/default}}
+                            {{/switch}}
+                        </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="column2">
+                    <footer>
+                        <p>@ACdS Integration 2024. Todos los derechos
+                            reservados.</p>
+                    </footer>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>
