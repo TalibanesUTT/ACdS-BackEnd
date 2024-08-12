@@ -271,7 +271,7 @@ export class AppointmentsService {
             const appointments = await this.repository.find({
                 where: { 
                     date, 
-                    time: time, 
+                    time: `${time}:00`, 
                     status: AppointmentStatus.AppointmentsPending
                 },
             });
@@ -382,9 +382,8 @@ export class AppointmentsService {
 
         while (currentTime <= endTime) {
             const time = this.tmzDatesService.getCurrentTimeString(currentTime);
-            times.push(time);
-            const minutes = this.tmzDatesService.getMinutesFromDate(currentTime);
-            currentTime = this.tmzDatesService.addRangeToDate(currentTime, 0, minutes + interval);
+            times.push(time.substring(0, 5));
+            currentTime = this.tmzDatesService.addRangeToDate(currentTime, 0, interval);
         }
         return times;
     }
