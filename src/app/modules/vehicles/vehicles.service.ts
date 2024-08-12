@@ -117,7 +117,9 @@ export class VehiclesService {
             vehicle.owner = owner;
         }
 
-        if (serialNumber && serialNumber.trim() !== "" && vehicle.serialNumber !== serialNumber.trim()) {
+        if (serialNumber === null || serialNumber.trim() === "") {
+            vehicle.serialNumber = null;
+        } else if (vehicle.serialNumber !== serialNumber.trim()) {
             const existingSerialNumber = !!(await this.vehicleRepository.findOneBy({ serialNumber }));
             if (existingSerialNumber) {
                 throw new BadRequestException("El número de serie ya se encuentra en uso");
