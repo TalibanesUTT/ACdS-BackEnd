@@ -265,9 +265,13 @@ export class ServiceOrdersService {
         let millisDepartureDate = null, millisCreateDate = null;
         if (departureDate) {
             const currentDate = this.tmzDateService.getCurrentDate();
-            const millisCurrentDate = this.tmzDateService.getMilliscendsSinceEpoch(currentDate);
-            millisDepartureDate = this.tmzDateService.getMilliscendsSinceEpoch(departureDate);
-            millisCreateDate = this.tmzDateService.getMilliscendsSinceEpoch(serviceOrder.createDate);
+            const trucatedDepartureDate = this.tmzDateService.normalizedToDateOnly(departureDate);
+            const trucatedCurrentDate = this.tmzDateService.normalizedToDateOnly(currentDate);
+            const trucatedCreateDate = this.tmzDateService.normalizedToDateOnly(serviceOrder.createDate);
+
+            const millisCurrentDate = this.tmzDateService.getMilliscendsSinceEpoch(trucatedCurrentDate);
+            millisDepartureDate = this.tmzDateService.getMilliscendsSinceEpoch(trucatedDepartureDate);
+            millisCreateDate = this.tmzDateService.getMilliscendsSinceEpoch(trucatedCreateDate);
 
             if (millisDepartureDate < millisCreateDate) {
                 throw new BadRequestException('La fecha de salida no puede ser anterior a la fecha de creación de la orden de servicio');
