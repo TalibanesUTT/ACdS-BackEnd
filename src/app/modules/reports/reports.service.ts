@@ -7,11 +7,11 @@ export class ReportsService {
         private readonly dbService: DatabaseService
     ){}
 
-    async getAccountingBalance(year: number, month: number): Promise<any> {
+    async getAccountingBalance(year: number, month?: number): Promise<any> {
         return this.dbService.executeProcedure("GetAccountingBalance", [year, month]);
     }
 
-    async getExpenditureSummary(year: number, month: number): Promise<any> {
+    async getExpenditureSummary(year: number, month?: number): Promise<any> {
         return this.dbService.executeProcedure("GetExpenditureSummary", [year, month]);
     }
 

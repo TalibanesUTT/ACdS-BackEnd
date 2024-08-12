@@ -10,9 +10,13 @@ export class DatabaseService {
     ){}
 
     async executeProcedure(procedureName: string, parameters: any[]): Promise<any> {
+        const sanitizedParams = parameters.map(param => 
+            param === null || param === undefined ? null : param
+        );
+
         return this.dataSource.query(
-            `CALL ${procedureName}(${parameters.map(() => "?").join(", ")})`,
-            parameters
+            `CALL ${procedureName}(${sanitizedParams.map(() => "?").join(", ")})`,
+            sanitizedParams
         );
     }
 }

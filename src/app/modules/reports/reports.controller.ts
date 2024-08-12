@@ -16,23 +16,25 @@ export class ReportsController {
     @Get("accounting-balance")
     @HttpCode(200)
     @ApiQuery({ name: "year", type: "number", description: "The year of the accounting balance" })
-    @ApiQuery({ name: "month", type: "number", description: "The month of the accounting balance" })
+    @ApiQuery({ name: "month", type: "number", description: "The month of the accounting balance", required: false })
     async getAccountingBalance(
         @Query("year", ParseIntPipe) year: number,
-        @Query("month", ParseIntPipe) month: number
+        @Query("month") month?: string
     ): Promise<any> {
-        return this.reportsService.getAccountingBalance(year, month);
+        const parsedMonth = month !== undefined ? parseInt(month, 10) : null;
+        return this.reportsService.getAccountingBalance(year, parsedMonth);
     }
 
     @Get("expenditure-summary")
     @HttpCode(200)
     @ApiQuery({ name: "year", type: "number", description: "The year of the expenditure summary" })
-    @ApiQuery({ name: "month", type: "number", description: "The month of the expenditure summary" })
+    @ApiQuery({ name: "month", type: "number", description: "The month of the expenditure summary", required: false })
     async getExpenditureSummary(
         @Query("year", ParseIntPipe) year: number,
-        @Query("month", ParseIntPipe) month: number
+        @Query("month") month?: string
     ): Promise<any> {
-        return this.reportsService.getExpenditureSummary(year, month);
+        const parsedMonth = month !== undefined ? parseInt(month, 10) : null;
+        return this.reportsService.getExpenditureSummary(year, parsedMonth);
     }
 
     @Get("income-summary")
