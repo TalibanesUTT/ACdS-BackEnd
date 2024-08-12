@@ -41,10 +41,8 @@ export class AppointmentsService {
     ) {}
 
     async find(user: User): Promise<Appointment[]> {
-        console.log(user);
         const userAppoinments = await user.appointments;
 
-        console.log(userAppoinments);
         if (!userAppoinments.length) {
             throw new NotFoundException("No tienes citas programadas");
         }
@@ -79,9 +77,13 @@ export class AppointmentsService {
     }
 
     async create(dto: CreateAppointmentDto, user: User): Promise<Appointment> {
-        console.log(user);
         const customer = user;
-        const message = "Ya tienes";
+        let message = "Ya tienes";
+
+        if (dto.userId) {
+            message = "El usuario ya tiene";
+        }
+
         const hasAppointment = await this.customerHasAppointmentsOnDate(
             customer,
             dto.date,
@@ -124,12 +126,14 @@ export class AppointmentsService {
         customer: User,
     ): Promise<Appointment> {
         let dateOrHourChanged = false;
+        let message = "Ya tienes";
         const appointment = await this.repository.findOneBy({ id });
         if (!appointment) {
             throw new NotAcceptableException("Cita no encontrada");
         }
 
         if (dto.userId && dto.userId !== appointment.customer.id) {
+            message = "El usuario ya tiene";
             appointment.customer = customer;
         } else {
             if (
