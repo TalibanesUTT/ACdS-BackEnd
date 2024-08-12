@@ -283,7 +283,7 @@ export class ServiceOrdersService {
         }
 
         const repairDays = departureDate ? 
-            Math.ceil((millisDepartureDate - millisCreateDate) / (1000 * 60 * 60 * 24)) :
+            Math.ceil((millisDepartureDate - millisCreateDate) / (1000 * 60 * 60 * 24)) + 1 :
             (serviceOrder.detail && serviceOrder.detail.departureDate ? serviceOrder.detail.repairDays : null);
 
         let detail = null;
