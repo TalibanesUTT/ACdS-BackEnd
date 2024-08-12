@@ -48,7 +48,11 @@ export class AppointmentsService {
             throw new NotFoundException("No tienes citas programadas");
         }
 
-        return userAppoinments;
+        const sortedAppointments = userAppoinments.sort((a, b) => {
+            return b.date.localeCompare(a.date);
+        });;
+    
+        return sortedAppointments
     }
 
     async findAll(): Promise<Appointment[]> {
@@ -378,7 +382,7 @@ export class AppointmentsService {
 
         while (currentTime <= endTime) {
             const time = this.tmzDatesService.getCurrentTimeString(currentTime);
-            times.push(time.substring(0, 5));
+            times.push(time);
             const minutes = this.tmzDatesService.getMinutesFromDate(currentTime);
             currentTime = this.tmzDatesService.addRangeToDate(currentTime, 0, minutes + interval);
         }

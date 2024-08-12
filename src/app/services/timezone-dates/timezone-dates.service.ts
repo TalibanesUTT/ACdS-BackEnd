@@ -34,7 +34,7 @@ export class TimezoneDatesService {
     }
 
     getCurrentTimeString(date: Date): string {
-        return moment.tz(date, this.timezone).format("HH:mm");
+        return moment.tz(date, this.timezone).format("HH:mm:ss");
     }
 
     getMinutesFromDate(date: Date): number {
