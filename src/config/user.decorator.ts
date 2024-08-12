@@ -10,7 +10,8 @@ export const GetUser = createParamDecorator(
         const request = ctx.switchToHttp().getRequest();
         const user: User = request.user;
         if (!user) {
-            return null;
+            throw new UnauthorizedException("El usuario no esta autenticado");
+            console.error(data);
         }
         return user;
     },

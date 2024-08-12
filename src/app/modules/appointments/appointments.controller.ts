@@ -8,6 +8,7 @@ import { ApiResponse } from "@/app/interfaces/api-response.interface";
 import { Appointment } from "@/app/entities/appointment.entity";
 import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
 import { TimezoneDatesService } from "@/app/services/timezone-dates/timezone-dates.service";
+import { UsersService } from "../users/users.service";
 
 @ApiTags("appointments")
 @Controller("appointments")
@@ -16,6 +17,7 @@ export class AppointmentsController {
     constructor(
         private readonly service: AppointmentsService,
         private readonly tmzDateService: TimezoneDatesService,
+        private readonly userService: UsersService,
     ) {}
 
     @Get()
@@ -58,7 +60,8 @@ export class AppointmentsController {
         @Body() dto: CreateAppointmentDto,
         @GetUser() user: User,
     ): Promise<ApiResponse<Appointment>> {
-        const newAppoinment = await this.service.create(dto, user);
+        const customer = (await this.userService.find(dto.userId)) ?? user;
+        const newAppoinment = await this.service.create(dto, customer);
         return {
             message: "Cita agendada correctamente",
             data: newAppoinment,
@@ -72,8 +75,12 @@ export class AppointmentsController {
     async update(
         @Body() dto: UpdateAppointmentDto,
         @Param("id") id: number,
+        @GetUser() sessionUser: User,
     ): Promise<ApiResponse<Appointment>> {
-        const updatedAppoinment = await this.service.update(id, dto);
+        const customer =
+            (await this.userService.find(dto.userId)) ?? sessionUser;
+
+        const updatedAppoinment = await this.service.update(id, dto, customer);
 
         return {
             message: "Cita actualizada correctamente",

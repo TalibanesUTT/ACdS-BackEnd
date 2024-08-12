@@ -23,8 +23,8 @@ export class AppointmentsService {
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday"
-    ]
+        "Saturday",
+    ];
     private readonly WORKING_HOURS = {
         start: "09:00",
         end: "18:30",
@@ -41,18 +41,19 @@ export class AppointmentsService {
     ) {}
 
     async find(user: User): Promise<Appointment[]> {
+        console.log(user);
         const userAppoinments = await user.appointments;
-        const hasAppoinments = userAppoinments.length > 0;
 
-        if (!hasAppoinments) {
+        console.log(userAppoinments);
+        if (!userAppoinments.length) {
             throw new NotFoundException("No tienes citas programadas");
         }
 
         const sortedAppointments = userAppoinments.sort((a, b) => {
             return b.date.localeCompare(a.date);
-        });;
-    
-        return sortedAppointments
+        });
+
+        return sortedAppointments;
     }
 
     async findAll(): Promise<Appointment[]> {
@@ -71,25 +72,20 @@ export class AppointmentsService {
             where: { status: AppointmentStatus.AppointmentsPending },
         });
 
-        if (!appointments.length) { 
+        if (!appointments.length) {
             throw new NotFoundException("No hay citas pendientes");
         }
-        return appointments
+        return appointments;
     }
 
     async create(dto: CreateAppointmentDto, user: User): Promise<Appointment> {
-        let customer = user;
-        let message = "Ya tienes";
-        if (dto.userId) {
-            message = "El usuario ya tiene";
-            customer = await this.usersService.find(dto.userId);
-
-            if (!customer) {
-                throw new NotFoundException("Usuario no encontrado");
-            }
-        }
-        
-        const hasAppointment = await this.customerHasAppointmentsOnDate(customer, dto.date);
+        console.log(user);
+        const customer = user;
+        const message = "Ya tienes";
+        const hasAppointment = await this.customerHasAppointmentsOnDate(
+            customer,
+            dto.date,
+        );
         if (hasAppointment) {
             throw new NotAcceptableException(
                 `${message} una cita programada para este día`,
@@ -102,13 +98,15 @@ export class AppointmentsService {
         );
 
         if (!isAvailable) {
-            throw new NotAcceptableException("No hay citas disponibles para el horario seleccionado");
+            throw new NotAcceptableException(
+                "No hay citas disponibles para el horario seleccionado",
+            );
         }
 
-        const appointment = new Appointment({ 
-            customer, 
+        const appointment = new Appointment({
+            customer,
             status: AppointmentStatus.AppointmentsPending,
-            ...dto 
+            ...dto,
         });
         this.validateAppointemt(appointment);
 
@@ -120,33 +118,44 @@ export class AppointmentsService {
         return savedAppointment;
     }
 
-    async update(id: number, dto: UpdateAppointmentDto): Promise<Appointment> {
-        var dateOrHourChanged = false;
-        let message = "Ya tienes";
+    async update(
+        id: number,
+        dto: UpdateAppointmentDto,
+        customer: User,
+    ): Promise<Appointment> {
+        let dateOrHourChanged = false;
         const appointment = await this.repository.findOneBy({ id });
         if (!appointment) {
             throw new NotAcceptableException("Cita no encontrada");
         }
 
         if (dto.userId && dto.userId !== appointment.customer.id) {
-            message = "El usuario ya tiene";
-            const customer = await this.usersService.find(dto.userId);
-            if (!customer) {
-                throw new NotFoundException("Usuario no encontrado");
-            }
-
             appointment.customer = customer;
         } else {
-            if (appointment.status === AppointmentStatus.AppointmentsCancelled || appointment.status === AppointmentStatus.AppointmentsCompleted) {
-                const msg = appointment.status === AppointmentStatus.AppointmentsCancelled ? "cancelada" : "completada";
-                throw new NotAcceptableException(`No puedes modificar esta cita porque ha sido ${msg}`);	
+            if (
+                appointment.status ===
+                    AppointmentStatus.AppointmentsCancelled ||
+                appointment.status === AppointmentStatus.AppointmentsCompleted
+            ) {
+                const msg =
+                    appointment.status ===
+                    AppointmentStatus.AppointmentsCancelled
+                        ? "cancelada"
+                        : "completada";
+                throw new NotAcceptableException(
+                    `No puedes modificar esta cita porque ha sido ${msg}`,
+                );
             }
 
             const now = this.tmzDatesService.getCurrentDate();
-            const appointmentDate = this.tmzDatesService.convertToDate(appointment.date);
+            const appointmentDate = this.tmzDatesService.convertToDate(
+                appointment.date,
+            );
 
             if (appointmentDate < now) {
-                throw new NotAcceptableException("No puedes modificar una cita cuya fecha ya se venció");
+                throw new NotAcceptableException(
+                    "No puedes modificar una cita cuya fecha ya se venció",
+                );
             }
         }
 
@@ -155,24 +164,23 @@ export class AppointmentsService {
         }
 
         if (dateOrHourChanged) {
-            const hasAppointment = await this.customerHasAppointmentsOnDate(appointment.customer, dto.date);
-            if (hasAppointment) {
-                throw new NotAcceptableException(
-                    `${message} una cita programada para este día`,
-                );
-            }
-
             const isAvailable = await this.isAvailableAppointment(
                 dto.date,
                 dto.time,
             );
-    
+
             if (!isAvailable) {
-                throw new NotAcceptableException("No hay citas disponibles para el horario seleccionado");
+                throw new NotAcceptableException(
+                    "No hay citas disponibles para el horario seleccionado",
+                );
             }
         }
 
-        const updatedAppointment = new Appointment({ ...dto });
+        const updatedAppointment = new Appointment({
+            date: dto.date,
+            time: dto.time,
+            customer: customer,
+        });
         this.validateAppointemt(updatedAppointment);
 
         const finalAppointment = this.repository.merge(appointment, dto);
@@ -191,9 +199,17 @@ export class AppointmentsService {
             throw new NotAcceptableException("Cita no encontrada");
         }
 
-        if (appointment.status === AppointmentStatus.AppointmentsCancelled || appointment.status === AppointmentStatus.AppointmentsCompleted) {
-            const msg = appointment.status === AppointmentStatus.AppointmentsCancelled ? "cancelada" : "completada";
-            throw new NotAcceptableException(`No puedes cancelar esta cita porque ya ha sido ${msg}`);	
+        if (
+            appointment.status === AppointmentStatus.AppointmentsCancelled ||
+            appointment.status === AppointmentStatus.AppointmentsCompleted
+        ) {
+            const msg =
+                appointment.status === AppointmentStatus.AppointmentsCancelled
+                    ? "cancelada"
+                    : "completada";
+            throw new NotAcceptableException(
+                `No puedes cancelar esta cita porque ya ha sido ${msg}`,
+            );
         }
 
         appointment.status = AppointmentStatus.AppointmentsCancelled;
@@ -212,7 +228,9 @@ export class AppointmentsService {
     }
 
     async sendAppointmentNotification(appointment: Appointment) {
-        const formattedDate = this.tmzDatesService.formatStringToDateString(appointment.date);
+        const formattedDate = this.tmzDatesService.formatStringToDateString(
+            appointment.date,
+        );
         await this.mailerService.addMailJob(
             appointment.customer.email,
             MailConstants.SubjectAppointmentForTodayMail,
@@ -227,21 +245,28 @@ export class AppointmentsService {
 
     async updatePendingAppointments() {
         const now = this.tmzDatesService.getCurrentDate();
-        const thresholdDate = this.tmzDatesService.subtractTimeToDate(now, 0, 0, 0, this.ONE_WEEK);
-        const formattedThresholdDate = this.tmzDatesService.formatDateToString(thresholdDate);
+        const thresholdDate = this.tmzDatesService.subtractTimeToDate(
+            now,
+            0,
+            0,
+            0,
+            this.ONE_WEEK,
+        );
+        const formattedThresholdDate =
+            this.tmzDatesService.formatDateToString(thresholdDate);
 
         const appointments = await this.repository.find({
-            where: { 
+            where: {
                 status: AppointmentStatus.AppointmentsPending,
-                date: LessThan(formattedThresholdDate), 
+                date: LessThan(formattedThresholdDate),
             },
         });
 
         if (appointments.length > 0) {
-            appointments.forEach(async appointment => {
+            appointments.forEach(async (appointment) => {
                 appointment.status = AppointmentStatus.AppointmentsCancelled;
                 await this.repository.save(appointment);
-            })
+            });
         }
     }
 
@@ -253,14 +278,14 @@ export class AppointmentsService {
         }
 
         const appointments = await this.repository.find({
-            where: { 
+            where: {
                 customer: user,
                 status: AppointmentStatus.AppointmentsPending,
             },
             select: ["date"],
         });
 
-        return appointments.map(appointment => appointment.date);
+        return appointments.map((appointment) => appointment.date);
     }
 
     async getUnavailableHours(date: string): Promise<string[]> {
@@ -269,10 +294,10 @@ export class AppointmentsService {
 
         for (const time of intervals) {
             const appointments = await this.repository.find({
-                where: { 
-                    date, 
-                    time: `${time}:00`, 
-                    status: AppointmentStatus.AppointmentsPending
+                where: {
+                    date,
+                    time: `${time}:00`,
+                    status: AppointmentStatus.AppointmentsPending,
                 },
             });
 
@@ -286,12 +311,14 @@ export class AppointmentsService {
 
     private validateAppointemt(appointment: Appointment) {
         if (!this.isValidDay(appointment.date)) {
-            throw new NotAcceptableException("El día seleccionado no es válido, las citas solo se pueden agendar de lunes a sábado");
+            throw new NotAcceptableException(
+                "El día seleccionado no es válido, las citas solo se pueden agendar de lunes a sábado",
+            );
         }
 
         if (!this.inWorkingHours(appointment.time)) {
             throw new NotAcceptableException(
-                `El horario seleccionado no es válido, las citas solo se pueden agendar de ${this.WORKING_HOURS.start} a ${this.WORKING_HOURS.end}`
+                `El horario seleccionado no es válido, las citas solo se pueden agendar de ${this.WORKING_HOURS.start} a ${this.WORKING_HOURS.end}`,
             );
         }
 
@@ -308,60 +335,84 @@ export class AppointmentsService {
     private inWorkingHours(time: string): boolean {
         const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
         if (!timePattern.test(time)) {
-            throw new NotAcceptableException("El formato de la hora es inválido, utilizar el formato HH:mm");
+            throw new NotAcceptableException(
+                "El formato de la hora es inválido, utilizar el formato HH:mm",
+            );
         }
 
         return (
             time >= this.WORKING_HOURS.start && time <= this.WORKING_HOURS.end
-        )
+        );
     }
 
     private validateAppointmentDate(date: string, time: string): void {
         const currentDate = this.tmzDatesService.getCurrentDate();
         const selectedDate = this.tmzDatesService.convertToDate(date);
-        const normalizedCurrentDate = this.tmzDatesService.formatDateToString(currentDate);
-        const normalizedSelectedDate = this.tmzDatesService.formatDateToString(selectedDate);  
+        const normalizedCurrentDate =
+            this.tmzDatesService.formatDateToString(currentDate);
+        const normalizedSelectedDate =
+            this.tmzDatesService.formatDateToString(selectedDate);
 
         if (normalizedSelectedDate < normalizedCurrentDate) {
-            throw new NotAcceptableException("No es posible programar una cita para una fecha anterior a la actual");
+            throw new NotAcceptableException(
+                "No es posible programar una cita para una fecha anterior a la actual",
+            );
         }
 
         const maxDate = this.tmzDatesService.addDaysToDate(currentDate, 60);
         if (selectedDate > maxDate) {
-            throw new NotAcceptableException("No es posible programar una cita para una fecha mayor a 60 días a partir de la fecha actual");
-        }  
+            throw new NotAcceptableException(
+                "No es posible programar una cita para una fecha mayor a 60 días a partir de la fecha actual",
+            );
+        }
 
         if (this.tmzDatesService.isSameDay(selectedDate, currentDate)) {
             const [hours, minutes] = time.split(":").map(Number);
-            const selectedDatetime = this.tmzDatesService.setTimeToDate(selectedDate, hours, minutes);
-            const currentTimePlusOneHour = this.tmzDatesService.addRangeToDate(currentDate, 1, 0);
+            const selectedDatetime = this.tmzDatesService.setTimeToDate(
+                selectedDate,
+                hours,
+                minutes,
+            );
+            const currentTimePlusOneHour = this.tmzDatesService.addRangeToDate(
+                currentDate,
+                1,
+                0,
+            );
 
             if (selectedDatetime < currentTimePlusOneHour) {
-                throw new NotAcceptableException("La hora de la cita debe ser al menos una hora mayor a la hora actual");
+                throw new NotAcceptableException(
+                    "La hora de la cita debe ser al menos una hora mayor a la hora actual",
+                );
             }
         }
     }
 
-    private async isAvailableAppointment(date: string, time: string): Promise<boolean> {
+    private async isAvailableAppointment(
+        date: string,
+        time: string,
+    ): Promise<boolean> {
         const formattedTime = `${time}:00`;
-        
+
         const appointments = await this.repository.find({
-            where: { 
-                date, 
+            where: {
+                date,
                 time: formattedTime,
-                status: AppointmentStatus.AppointmentsPending
+                status: AppointmentStatus.AppointmentsPending,
             },
         });
 
         return appointments.length < this.APPOINTMENTS_LIMIT_PER_HOUR;
     }
 
-    private async customerHasAppointmentsOnDate(user: User, date: string): Promise<boolean> {
+    private async customerHasAppointmentsOnDate(
+        user: User,
+        date: string,
+    ): Promise<boolean> {
         const appointments = await this.repository.find({
-            where: { 
+            where: {
                 customer: user,
                 date,
-                status: AppointmentStatus.AppointmentsPending,  
+                status: AppointmentStatus.AppointmentsPending,
             },
         });
 
@@ -377,13 +428,21 @@ export class AppointmentsService {
 
     private getTimeIntervals(start: string, end: string, interval: number) {
         const times = [];
-        let currentTime = this.tmzDatesService.createDateFromDatetime(`1970-01-01T${start}:00`);
-        const endTime = this.tmzDatesService.createDateFromDatetime(`1970-01-01T${end}:00`);
+        let currentTime = this.tmzDatesService.createDateFromDatetime(
+            `1970-01-01T${start}:00`,
+        );
+        const endTime = this.tmzDatesService.createDateFromDatetime(
+            `1970-01-01T${end}:00`,
+        );
 
         while (currentTime <= endTime) {
             const time = this.tmzDatesService.getCurrentTimeString(currentTime);
             times.push(time.substring(0, 5));
-            currentTime = this.tmzDatesService.addRangeToDate(currentTime, 0, interval);
+            currentTime = this.tmzDatesService.addRangeToDate(
+                currentTime,
+                0,
+                interval,
+            );
         }
         return times;
     }

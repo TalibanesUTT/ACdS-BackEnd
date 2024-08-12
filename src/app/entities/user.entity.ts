@@ -19,7 +19,7 @@ import { AppointmentStatus } from "@/constants/values-constants";
     name: "Users",
 })
 export class User {
-    @PrimaryGeneratedColumn({ 
+    @PrimaryGeneratedColumn({
         type: "bigint",
         unsigned: true,
     })
@@ -38,18 +38,18 @@ export class User {
     })
     lastName: string;
 
-    @Column({ 
+    @Column({
         type: "nvarchar",
         length: 100,
-        unique: true 
+        unique: true,
     })
     email: string;
 
-    @Column({ 
+    @Column({
         name: "phone_number",
         type: "nvarchar",
         length: 10,
-     })
+    })
     phoneNumber: string;
 
     @Exclude()
@@ -60,39 +60,39 @@ export class User {
     password: string;
 
     @Exclude()
-    @Column({ 
-        nullable: true, 
+    @Column({
+        nullable: true,
         name: "verification_code",
         type: "nvarchar",
         length: 100,
     })
     verificationCode: string;
 
-    @Column({ 
+    @Column({
         type: "boolean",
-        default: false, 
-        name: "email_confirmed" 
+        default: false,
+        name: "email_confirmed",
     })
     emailConfirmed: boolean;
 
-    @Column({ 
-        type: "boolean", 
-        default: false, 
-        name: "phone_confirmed" 
+    @Column({
+        type: "boolean",
+        default: false,
+        name: "phone_confirmed",
     })
     phoneConfirmed: boolean;
 
-    @Column({ 
-        type: "boolean", 
-        default: false 
+    @Column({
+        type: "boolean",
+        default: false,
     })
     active: boolean;
 
     @Exclude()
-    @Column({ 
-        type: "boolean", 
-        default: false, 
-        name: "changed_by_admin" 
+    @Column({
+        type: "boolean",
+        default: false,
+        name: "changed_by_admin",
     })
     changedByAdmin: boolean;
 
@@ -113,7 +113,7 @@ export class User {
 
     @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
     vehicles: Vehicle[];
-    
+
     @OneToMany(() => Appointment, (appointment) => appointment.customer)
     appointments: Promise<Appointment[]>;
 
