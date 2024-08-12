@@ -72,9 +72,11 @@ export class VehiclesService {
             throw new NotFoundException("Marca no encontrada");
         }
         
-        const existingSerialNumber = !!(await this.vehicleRepository.findOneBy({ serialNumber }));
-        if (existingSerialNumber) {
-            throw new BadRequestException("El número de serie ya se encuentra en uso");
+        if (serialNumber && serialNumber.trim() !== "") {
+            const existingSerialNumber = !!(await this.vehicleRepository.findOneBy({ serialNumber }));
+            if (existingSerialNumber) {
+                throw new BadRequestException("El número de serie ya se encuentra en uso");
+            }
         }
 
         let carModel = await this.carModelRepository.findOne({
@@ -88,7 +90,7 @@ export class VehiclesService {
         const vehicle = this.vehicleRepository.create({
             owner,
             model: carModel,
-            serialNumber,
+            serialNumber: serialNumber.trim() || null,
             ...rest
         });
 
@@ -115,12 +117,12 @@ export class VehiclesService {
             vehicle.owner = owner;
         }
 
-        if (serialNumber && vehicle.serialNumber !== serialNumber) {
+        if (serialNumber && serialNumber.trim() !== "" && vehicle.serialNumber !== serialNumber.trim()) {
             const existingSerialNumber = !!(await this.vehicleRepository.findOneBy({ serialNumber }));
             if (existingSerialNumber) {
                 throw new BadRequestException("El número de serie ya se encuentra en uso");
             }
-            vehicle.serialNumber = serialNumber;
+            vehicle.serialNumber = serialNumber.trim();
         }
 
         let currentModel = vehicle.model;
