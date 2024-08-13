@@ -20,6 +20,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
             );
         }
 
+        if (!user.active) {
+            throw new UnauthorizedException(
+                "Cuenta de usuario desactivada",
+            );
+        }
+
         if (!user.emailConfirmed) {
             throw new UnauthorizedException(
                 "Tu correo electrónico no ha sido confirmado",
