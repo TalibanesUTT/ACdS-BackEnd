@@ -36,7 +36,20 @@ BEGIN
         CarBrands b ON m.brand_id = b.id
     WHERE
         sod.total_cost IS NOT NULL AND
-        sod.departure_date BETWEEN p_StartDate AND p_EndDate;
+        sod.departure_date BETWEEN p_StartDate AND p_EndDate
+    GROUP BY
+        so.file_number,
+        so.create_date,
+        b.brand,
+        m.model,
+        v.year,
+        v.color,
+        sod.departure_date,
+        sod.repair_days,
+        so.initial_mileage,
+        sod.final_mileage,
+        sod.budget,
+        sod.total_cost;
     
     SELECT 
         ROUND(SUM(sod.total_cost), 2) AS TotalIncome
