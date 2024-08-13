@@ -7,7 +7,7 @@ BEGIN
     DECLARE v_MonthsDiff INT;
 
     SET p_EndDate = DATE_ADD(p_EndDate, INTERVAL 1 DAY);
-    SET v_DaysDiff = DATEDIFF(p_EndDate, p_StartDate) + 1;
+    SET v_DaysDiff = DATEDIFF(p_EndDate, p_StartDate);
 
     SELECT
         so.file_number 'FileNumber',
