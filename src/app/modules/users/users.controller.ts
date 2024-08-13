@@ -16,7 +16,7 @@ export class UsersController {
 
     @Get()
     @HttpCode(200)
-    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT)
+    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT, RoleEnum.MECHANIC)
     async getUsers(): Promise<ApiResponse<User[]>> {
         const users = await this.usersService.findAll();
         return { 
