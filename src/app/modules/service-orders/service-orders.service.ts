@@ -412,6 +412,7 @@ export class ServiceOrdersService {
 
             this.sendStatusNotification(updatedOrder, updatedOrder.actualStatus, '', '', '', true);
             this.statusGateway.sendStatusUpdate(updatedOrder.id, updatedOrder.actualStatus, { rollback: true });
+            this.statusGateway.sendStatusNotification(updatedOrder.vehicle.owner.id, updatedOrder.id, updatedOrder.actualStatus, { rollback: true });
             return updatedOrder;
         } else {
             if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServiceOrdersFinished) { 
@@ -466,6 +467,12 @@ export class ServiceOrdersService {
             const comments = data.comments ? data.comments : '';
             this.sendStatusNotification(updatedOrder, newStatus, formattedDate, formattedTime, comments, false);
             this.statusGateway.sendStatusUpdate(
+                updatedOrder.id, 
+                newStatus, 
+                { date: formattedDate, time: formattedTime, comments }
+            );
+            this.statusGateway.sendStatusNotification(
+                updatedOrder.vehicle.owner.id, 
                 updatedOrder.id, 
                 newStatus, 
                 { date: formattedDate, time: formattedTime, comments }
