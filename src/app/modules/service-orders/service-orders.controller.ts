@@ -10,6 +10,7 @@ import { CreateServiceOrderDetailDto } from "./dto/service-order-detail.dto";
 import { GetUser } from "@/config/user.decorator";
 import { User } from "@/app/entities/user.entity";
 import { StatusDto } from "./dto/status.dto";
+import { HistoryServerOrder } from "@/app/entities/history-server-order.entity";
 
 @Controller("service-orders")
 @ApiTags("service-orders")
@@ -64,6 +65,18 @@ export class ServiceOrdersController {
             status: 200,
             message: null,
             data: orders,
+        }
+    }
+
+    @Get("status/:id")
+    @HttpCode(200)
+    @ApiParam({ name: "id", type: "number", description: "The id of the service order" })
+    async getServiceOrderStatuses(@Param("id", ParseIntPipe) id: number): Promise<ApiResponse<HistoryServerOrder[]>> {
+        const statuses = await this.serviceOrdersService.getStatusesByServiceOrder(id);
+        return {
+            status: 200,
+            message: null,
+            data: statuses,
         }
     }
 
@@ -128,7 +141,6 @@ export class ServiceOrdersController {
 
     @Post("updateStatus/:id")
     @HttpCode(200)
-    @Roles(RoleEnum.ADMIN, RoleEnum.ROOT, RoleEnum.MECHANIC)
     @ApiParam({ name: "id", type: "number", description: "The id of the service order" })
     async updateServiceOrderStatus(
         @Param("id", ParseIntPipe) id: number,

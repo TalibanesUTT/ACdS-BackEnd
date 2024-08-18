@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { MailerService } from "@/app/services/mailer/mailer.service";
 import { MailConstants } from "@/constants/mail-constants";
 import { TimezoneDatesService } from "@/app/services/timezone-dates/timezone-dates.service";
+import { SocketGateway } from "@/app/services/socket/web-socket-gateway";
 
 @Injectable()
 export class ServiceOrdersService {
@@ -37,7 +38,8 @@ export class ServiceOrdersService {
         private readonly historyRepository: Repository<HistoryServerOrder>,
         private readonly userService: UsersService,
         private readonly mailerService: MailerService,
-        private readonly tmzDateService: TimezoneDatesService
+        private readonly tmzDateService: TimezoneDatesService,
+        private readonly statusGateway: SocketGateway
     ) {}
 
     async findAll(limit = 100): Promise<ServiceOrder[]> {
@@ -130,6 +132,16 @@ export class ServiceOrdersService {
         }
 
         return pendingOrders;
+    }
+
+    getStatusesByServiceOrder(orderId: number): Promise<HistoryServerOrder[]> {
+        return this.historyRepository.find({
+            where: { 
+                serviceOrder: { id: orderId },
+                rollback: false
+            },
+            order: { time: 'DESC' }
+        });
     }
 
     async create(data: CreateServiceOrderDto, user: User): Promise<ServiceOrder> {
@@ -371,6 +383,12 @@ export class ServiceOrdersService {
             }
 
             newStatus = ServiceOrderStatus.ServiceOrdersOnHold;
+        } else if (data.reject) {
+            if (order.actualStatus !== ServiceOrderStatus.ServiceOrdersIssued) {
+                throw new BadRequestException('No se puede rechazar la orden de servicio en el estatus actual');
+            }
+
+            newStatus = ServiceOrderStatus.ServerOrdersRejected;
         } else if (data.rollback) {
             if (order.actualStatus === ServiceOrderStatus.ServiceOrdersReceived) {
                 throw new BadRequestException('No se puede revertir el estatus de la orden de servicio');
@@ -393,6 +411,7 @@ export class ServiceOrdersService {
             })
 
             this.sendStatusNotification(updatedOrder, updatedOrder.actualStatus, '', '', '', true);
+            this.statusGateway.sendStatusUpdate(updatedOrder.id, updatedOrder.actualStatus, { rollback: true });
             return updatedOrder;
         } else {
             if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServiceOrdersFinished) { 
@@ -446,6 +465,11 @@ export class ServiceOrdersService {
             const formattedTime = format(newHistoryEntry.time, 'HH:mm');
             const comments = data.comments ? data.comments : '';
             this.sendStatusNotification(updatedOrder, newStatus, formattedDate, formattedTime, comments, false);
+            this.statusGateway.sendStatusUpdate(
+                updatedOrder.id, 
+                newStatus, 
+                { date: formattedDate, time: formattedTime, comments }
+            );
 
             return updatedOrder;
         }

@@ -17,4 +17,5 @@ export enum ServiceOrderStatus {
     ServiceOrdersFinished = "Finalizado",
     ServiceOrdersOnHold = "En espera",
     ServiceOrdersCancelled = "Cancelado",
+    ServerOrdersRejected = "Rechazado por el cliente",
 }

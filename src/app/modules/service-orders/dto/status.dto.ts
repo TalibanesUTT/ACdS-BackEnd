@@ -24,6 +24,11 @@ export class StatusDto {
     @IsBoolean()
     onHold?: boolean;
 
+    @ApiProperty({ description: "The service order will be rejected?", example: false, default: false })
+    @IsOptional()
+    @IsBoolean()
+    reject?: boolean;
+
     @ValidateStatus({ message: "Solo es posible seleccionar una opción a la vez" })
     validateStatus: boolean;
 }

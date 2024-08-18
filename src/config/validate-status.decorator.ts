@@ -10,7 +10,7 @@ export function ValidateStatus(validationOptions?: ValidationOptions) {
             validator: {
                 validate(value: any, args: ValidationArguments) {
                     const obj = args.object as any;
-                    const booleans = [obj.rollback, obj.cancel, obj.onHold];
+                    const booleans = [obj.rollback, obj.cancel, obj.onHold, obj.reject];
                     const trueCount = booleans.filter(Boolean).length;
                     return trueCount <= 1;
                 },

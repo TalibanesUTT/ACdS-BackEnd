@@ -11,12 +11,14 @@ import { ServiceOrderDetail } from "@/app/entities/service-order-detail.entity";
 import { HistoryServerOrder } from "@/app/entities/history-server-order.entity";
 import { MailerModule } from "@/app/services/mailer/mailer.module";
 import { TimezoneDatesModule } from "@/app/services/timezone-dates/timezone-dates.module";
+import { WebSocketModule } from "@/app/services/socket/web-socket.module";
 
 @Module({
     imports: [
         UsersModule,
         MailerModule,
         TimezoneDatesModule,
+        WebSocketModule,
         TypeOrmModule.forFeature([ServiceOrder, Vehicle, Appointment, Service, ServiceOrderDetail, HistoryServerOrder])
     ],
     controllers: [ServiceOrdersController],

@@ -39,6 +39,7 @@ import { TimezoneDatesModule } from "./app/services/timezone-dates/timezone-date
 import { ExpendituresModule } from "./app/modules/expenditures/expenditures.module";
 import { DatabaseModule } from "./app/services/database/database.module";
 import { ReportsModule } from "./app/modules/reports/reports.module";
+import { WebSocketModule } from "./app/services/socket/web-socket.module";
 
 @Module({
     imports: [
@@ -89,6 +90,7 @@ import { ReportsModule } from "./app/modules/reports/reports.module";
         ExpendituresModule,
         DatabaseModule,
         ReportsModule,
+        WebSocketModule,
     ],
     controllers: [AppController],
     providers: [
