@@ -374,8 +374,9 @@ export class ServiceOrdersService {
                 throw new BadRequestException('La orden de servicio ya se encuentra en espera');
             }
 
-            if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled) {
-                throw new BadRequestException('No se puede poner en espera la orden de servicio, ya ha sido cancelada');
+            if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServerOrdersRejected) {
+                const message = order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled ? 'cancelada' : 'rechazada';
+                throw new BadRequestException(`No se puede poner en espera la orden de servicio, ya ha sido ${message}`);
             }
 
             if (currentStatusIndex >= ServiceOrderStatusFlow.indexOf(ServiceOrderStatus.ServiceOrdersReadyToPickUp)) {
@@ -415,9 +416,12 @@ export class ServiceOrdersService {
             this.statusGateway.sendStatusNotification(updatedOrder.vehicle.owner.id, updatedOrder.id, updatedOrder.actualStatus, { rollback: true });
             return updatedOrder;
         } else {
-            if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServiceOrdersFinished) { 
+            if (order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled || order.actualStatus === ServiceOrderStatus.ServiceOrdersFinished ||
+                order.actualStatus === ServiceOrderStatus.ServerOrdersRejected) { 
                 const isCancelled = order.actualStatus === ServiceOrderStatus.ServiceOrdersCancelled;
-                const message = isCancelled ? 'cancelada' : 'finalizada';
+                const isRejected = order.actualStatus === ServiceOrderStatus.ServerOrdersRejected;
+
+                const message = isCancelled ? 'cancelada' : isRejected ? 'rechazada' : 'finalizada';
                 throw new BadRequestException(`La orden de servicio ya se encuentra ${message} y no se puede modificar`);
             }
 
