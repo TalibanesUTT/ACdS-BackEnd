@@ -329,7 +329,8 @@ export class ServiceOrdersService {
         }
 
         const currentStatusIndex = ServiceOrderStatusFlow.findIndex(status => status === order.actualStatus);
-        if (currentStatusIndex === -1 && (order.actualStatus !== ServiceOrderStatus.ServiceOrdersOnHold && order.actualStatus !== ServiceOrderStatus.ServiceOrdersCancelled)) {
+        if (currentStatusIndex === -1 && (order.actualStatus !== ServiceOrderStatus.ServiceOrdersOnHold && order.actualStatus !== ServiceOrderStatus.ServiceOrdersCancelled &&
+            order.actualStatus !== ServiceOrderStatus.ServerOrdersRejected)) {
             throw new BadRequestException('El estado actual de la orden de servicio no es válido');
         }
 
