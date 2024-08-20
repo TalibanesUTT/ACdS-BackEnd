@@ -30,6 +30,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     sendStatusNotification(userId: number, orderId: number, status: string, details: any) {
-        this.server.emit(`statusNotification-${userId}`, { orderId, status, ...details });
+        this.server.emit(`statusNotification`, { orderId, status, ...details });
     }
 }
